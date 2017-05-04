@@ -16,8 +16,8 @@ import static com.github.ejahns.Parser.TokenType.*;
 
 public class @Model.ParserClassName {
 
-	private static final ThreadLocal<GherkinElementStack> STACK = new ThreadLocal<>();
-    private static final ThreadLocal<TokenQueue> QUEUE = new ThreadLocal<>();
+	private GherkinElementStackHandler stackHandler = new GherkinElementStackHandler();
+	private TokenQueue queue;
 
 	public enum TokenType {
 		@foreach(var rule in Model.RuleSet.TokenRules)
@@ -26,9 +26,8 @@ public class @Model.ParserClassName {
 	}
 
 	public @Model.RuleSet.StartRule.Name parse(TokenQueue queue) {
-		QUEUE.set(queue);
-        STACK.set(new GherkinElementStack());
-		STACK.get().push(@(Model.RuleSet.StartRule.Name).class);
+		this.queue = queue;
+		stackHandler.push(@(Model.RuleSet.StartRule.Name).class);
 		int state = 0;
 		Token token;
 		do {
@@ -36,9 +35,9 @@ public class @Model.ParserClassName {
 			state = matchToken(state, token);
 		} while (!token.isEOF());
 
-		STACK.get().collapse(@(Model.RuleSet.StartRule.Name).class);
+		stackHandler.collapse(@(Model.RuleSet.StartRule.Name).class);
 
-		return STACK.get().resolve();
+		return stackHandler.resolve();
 	}
 
 	private int matchToken(int state, Token token) {
@@ -91,7 +90,7 @@ public class @Model.ParserClassName {
 		boolean match = false;
 		do
 		{
-			token = QUEUE.get().next();
+			token = queue.next();
 			newQueue.add(token);
 
 			if (false
@@ -110,7 +109,7 @@ public class @Model.ParserClassName {
 			@:|| @matchToken(tokenType)
 		}
 		);
-		QUEUE.get().add(newQueue);
+		queue.add(newQueue);
 		return match;
 	}</text>
 }
@@ -119,13 +118,13 @@ public class @Model.ParserClassName {
 {
 	switch(production.Type) {
 		case ProductionRuleType.Start:
-			@:STACK.get().push(@(production.RuleName).class);
+			@:stackHandler.push(@(production.RuleName).class);
 			break;
 		case ProductionRuleType.End:
-			@:STACK.get().collapse(@(production.RuleName).class);
+			@:stackHandler.collapse(@(production.RuleName).class);
 			break;
 		case ProductionRuleType.Process:
-			@:STACK.get().consume(token);
+			@:stackHandler.consume(token);
 			break;
 	}
 }

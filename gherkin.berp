@@ -5,18 +5,13 @@
 	Namespace -> Gherkin
 ]
 
-GherkinDocument! := Feature?
-Feature! := #Language? #TagLine* #FeatureLine #Other* Background? ScenarioDefinition*
+Feature! := #Language? #TagLine* #FeatureLine #Other* Background? (Scenario|ScenarioOutline)*
 
 Background! := #BackgroundLine #Other* Step*
 
-// we could avoid defining ScenarioDefinition, but that would require regular look-aheads, so worse performance
-ScenarioDefinition! := #TagLine* (Scenario | ScenarioOutline)
+Scenario! [#Empty|#Comment|#TagLine->#ScenarioLine]:= #TagLine* #ScenarioLine #Other* Step*
 
-Scenario! := #ScenarioLine #Other* Step*
-
-ScenarioOutline! := #ScenarioOutlineLine #Other* Step* ExamplesDefinition*
-
+ScenarioOutline! [#Empty|#Comment|#TagLine->#ScenarioOutlineLine]:= #TagLine* #ScenarioOutlineLine #Other* Step* ExamplesDefinition*
 
 // after the first "Examples" block, interpreting a tag line is ambiguous (tagline of next examples or of next scenario)
 // because of this, we need a lookahead hint, that connects the tag line to the next examples, if there is an examples block ahead
