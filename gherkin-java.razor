@@ -16,8 +16,8 @@ import static com.github.ejahns.Parser.TokenType.*;
 
 public class @Model.ParserClassName {
 
-	private GherkinElementStack stack = new GherkinElementStack();
-	private TokenQueue queue;
+	private static final ThreadLocal<GherkinElementStack> STACK = new ThreadLocal<>();
+    private static final ThreadLocal<TokenQueue> QUEUE = new ThreadLocal<>();
 
 	public enum TokenType {
 		@foreach(var rule in Model.RuleSet.TokenRules)
@@ -26,8 +26,9 @@ public class @Model.ParserClassName {
 	}
 
 	public @Model.RuleSet.StartRule.Name parse(TokenQueue queue) {
-		this.queue = queue;
-		stack.push(@(Model.RuleSet.StartRule.Name).class);
+		QUEUE.set(queue);
+        STACK.set(new GherkinElementStack());
+		STACK.get().push(@(Model.RuleSet.StartRule.Name).class);
 		int state = 0;
 		Token token;
 		do {
@@ -35,9 +36,9 @@ public class @Model.ParserClassName {
 			state = matchToken(state, token);
 		} while (!token.isEOF());
 
-		stack.collapse(@(Model.RuleSet.StartRule.Name).class);
+		STACK.get().collapse(@(Model.RuleSet.StartRule.Name).class);
 
-		return stack.resolve();
+		return STACK.get().resolve();
 	}
 
 	private int matchToken(int state, Token token) {
@@ -90,7 +91,7 @@ public class @Model.ParserClassName {
 		boolean match = false;
 		do
 		{
-			token = queue.next();
+			token = QUEUE.get().next();
 			newQueue.add(token);
 
 			if (false
@@ -109,7 +110,7 @@ public class @Model.ParserClassName {
 			@:|| @matchToken(tokenType)
 		}
 		);
-		queue.add(newQueue);
+		QUEUE.get().add(newQueue);
 		return match;
 	}</text>
 }
@@ -118,13 +119,13 @@ public class @Model.ParserClassName {
 {
 	switch(production.Type) {
 		case ProductionRuleType.Start:
-			@:stack.push(@(production.RuleName).class);
+			@:STACK.get().push(@(production.RuleName).class);
 			break;
 		case ProductionRuleType.End:
-			@:stack.collapse(@(production.RuleName).class);
+			@:STACK.get().collapse(@(production.RuleName).class);
 			break;
 		case ProductionRuleType.Process:
-			@:stack.consume(token);
+			@:STACK.get().consume(token);
 			break;
 	}
 }

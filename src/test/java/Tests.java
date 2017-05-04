@@ -47,5 +47,4 @@ public class Tests {
 		JsonElement parse1 = jsonParser.parse(reader);
 		Assert.assertEquals(parse1, gson.toJsonTree(parse));
 	}
-
 }
