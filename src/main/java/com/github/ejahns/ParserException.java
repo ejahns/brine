@@ -2,7 +2,7 @@ package com.github.ejahns;
 
 import java.util.List;
 
-import com.sun.deploy.util.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 
 public class ParserException extends RuntimeException {
 
