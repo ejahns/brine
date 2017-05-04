@@ -5,14 +5,17 @@
 @using Berp;
 package com.github.ejahns;
 
+import java.util.List;
 import java.util.ArrayDeque;
 import java.util.Queue;
 
+import com.github.ejahns.ParserException.*;
 @foreach(var rule in Model.RuleSet.DerivedRules.Where(r => !r.TempRule))
 {<text>import com.github.ejahns.model.@(rule.Name);
 </text>}
 
 import static com.github.ejahns.Parser.TokenType.*;
+import static java.util.Arrays.*;
 
 public class @Model.ParserClassName {
 
@@ -22,8 +25,12 @@ public class @Model.ParserClassName {
 	public enum TokenType {
 		@foreach(var rule in Model.RuleSet.TokenRules)
 		{<text>		@rule.Name.Replace("#", "")Token,
-</text>}
-	}
+</text>}		;
+		@@Override
+		public String toString() {
+			return name().replace("Token", "");
+		}
+		}
 
 	public @Model.RuleSet.StartRule.Name parse(TokenQueue queue) {
 		this.queue = queue;
@@ -78,7 +85,7 @@ public class @Model.ParserClassName {
 			}
 		@:}
 		}
-		@HandleParserError()
+		@HandleParserError(state.Transitions.Select(t => t.TokenType.ToString()).Distinct())
 	}</text>
 }
 @foreach(var lookAheadHint in Model.RuleSet.LookAheadHints)
@@ -128,7 +135,9 @@ public class @Model.ParserClassName {
 			break;
 	}
 }
-@helper HandleParserError()
-{<text>throw new IllegalStateException();</text>}
+@helper HandleParserError(IEnumerable<string> expectedTokens)
+{<text>
+		List<String> expectedTokens = asList("@Raw(string.Join("\", \"", expectedTokens))");
+		throw new UnexpectedTokenException(token.toString(), expectedTokens, token.getLineNum());</text>}
 @helper matchToken(TokenType tokenType)
 {<text>token.getType().equals(@(tokenType)Token)</text>}
