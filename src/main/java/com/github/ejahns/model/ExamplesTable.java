@@ -2,9 +2,7 @@ package com.github.ejahns.model;
 
 import com.github.ejahns.Token;
 
-/**
- * Created by ejahns on 5/3/2017.
- */
+//TODO implement
 public class ExamplesTable implements GherkinElement {
 
 	@Override

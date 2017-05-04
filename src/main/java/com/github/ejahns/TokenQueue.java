@@ -19,7 +19,8 @@ public class TokenQueue {
 			"Given ", StepLineToken,
 			"When ", StepLineToken,
 			"Then ", StepLineToken,
-			"And ", StepLineToken
+			"And ", StepLineToken,
+			"* ", StepLineToken
 		);
 	private static final Map<String, Parser.TokenType> stepKeys =
 		ImmutableMap.of(
@@ -64,6 +65,8 @@ public class TokenQueue {
 		} while (null != line);
 	}
 
+	//TODO added tokenization rules for DocStringSeparatorToken and TableRowToken
+	//TODO handle LanguageToken?
 	private Token tokenize(String s, int i) {
 		if (null == s) {
 			return new Token(null, EOFToken, i);
