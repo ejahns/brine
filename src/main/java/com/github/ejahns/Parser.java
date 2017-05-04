@@ -7,10 +7,8 @@ package com.github.ejahns;
 import java.util.ArrayDeque;
 import java.util.Queue;
 
-import com.github.ejahns.model.GherkinDocument;
 import com.github.ejahns.model.Feature;
 import com.github.ejahns.model.Background;
-import com.github.ejahns.model.ScenarioDefinition;
 import com.github.ejahns.model.Scenario;
 import com.github.ejahns.model.ScenarioOutline;
 import com.github.ejahns.model.ExamplesDefinition;
@@ -24,8 +22,8 @@ import static com.github.ejahns.Parser.TokenType.*;
 
 public class Parser {
 
-	private static final ThreadLocal<GherkinElementStack> STACK = new ThreadLocal<>();
-    private static final ThreadLocal<TokenQueue> QUEUE = new ThreadLocal<>();
+	private GherkinElementStackHandler stackHandler = new GherkinElementStackHandler();
+	private TokenQueue queue;
 
 	public enum TokenType {
 		EOFToken,
@@ -44,10 +42,9 @@ public class Parser {
 		OtherToken,
 	}
 
-	public GherkinDocument parse(TokenQueue queue) {
-		QUEUE.set(queue);
-        STACK.set(new GherkinElementStack());
-		STACK.get().push(GherkinDocument.class);
+	public Feature parse(TokenQueue queue) {
+		this.queue = queue;
+		stackHandler.push(Feature.class);
 		int state = 0;
 		Token token;
 		do {
@@ -55,9 +52,9 @@ public class Parser {
 			state = matchToken(state, token);
 		} while (!token.isEOF());
 
-		STACK.get().collapse(GherkinDocument.class);
+		stackHandler.collapse(Feature.class);
 
-		return STACK.get().resolve();
+		return stackHandler.resolve();
 	}
 
 	private int matchToken(int state, Token token) {
@@ -111,8 +108,8 @@ public class Parser {
 			case 15:
 				newState = matchTokenAt_15(token);
 				break;
-			case 17:
-				newState = matchTokenAt_17(token);
+			case 16:
+				newState = matchTokenAt_16(token);
 				break;
 			case 18:
 				newState = matchTokenAt_18(token);
@@ -129,6 +126,9 @@ public class Parser {
 			case 22:
 				newState = matchTokenAt_22(token);
 				break;
+			case 23:
+				newState = matchTokenAt_23(token);
+				break;
 			default:
 				throw new IllegalStateException("Unknown state: " + state);
 		}
@@ -137,1057 +137,1179 @@ public class Parser {
 
 	// Start
 	private int matchTokenAt_0(Token token) {
-		if (token.getType().equals(EOFToken)) {
-			STACK.get().consume(token);
-			return 16;
-		}
 		if (token.getType().equals(LanguageToken)) {
-			STACK.get().push(Feature.class);
-			STACK.get().consume(token);
+			stackHandler.consume(token);
 			return 1;
 		}
 		if (token.getType().equals(TagLineToken)) {
-			STACK.get().push(Feature.class);
-			STACK.get().consume(token);
+			stackHandler.consume(token);
 			return 1;
 		}
 		if (token.getType().equals(FeatureLineToken)) {
-			STACK.get().push(Feature.class);
-			STACK.get().consume(token);
+			stackHandler.consume(token);
 			return 2;
 		}
 		if (token.getType().equals(CommentToken)) {
-			STACK.get().consume(token);
+			stackHandler.consume(token);
 			return 0;
 		}
 		if (token.getType().equals(EmptyToken)) {
-			STACK.get().consume(token);
+			stackHandler.consume(token);
 			return 0;
 		}
 		throw new IllegalStateException();
 	}
 
-	// GherkinDocument:0>Feature:0>#Language:0
+	// Feature:0>#Language:0
 	private int matchTokenAt_1(Token token) {
 		if (token.getType().equals(TagLineToken)) {
-			STACK.get().consume(token);
+			stackHandler.consume(token);
 			return 1;
 		}
 		if (token.getType().equals(FeatureLineToken)) {
-			STACK.get().consume(token);
+			stackHandler.consume(token);
 			return 2;
 		}
 		if (token.getType().equals(CommentToken)) {
-			STACK.get().consume(token);
+			stackHandler.consume(token);
 			return 1;
 		}
 		if (token.getType().equals(EmptyToken)) {
-			STACK.get().consume(token);
+			stackHandler.consume(token);
 			return 1;
 		}
 		throw new IllegalStateException();
 	}
 
-	// GherkinDocument:0>Feature:2>#FeatureLine:0
+	// Feature:2>#FeatureLine:0
 	private int matchTokenAt_2(Token token) {
 		if (token.getType().equals(EOFToken)) {
-			STACK.get().collapse(Feature.class);
-			STACK.get().consume(token);
-			return 16;
+			stackHandler.consume(token);
+			return 17;
 		}
 		if (token.getType().equals(BackgroundLineToken)) {
-			STACK.get().push(Background.class);
-			STACK.get().consume(token);
+			stackHandler.push(Background.class);
+			stackHandler.consume(token);
 			return 3;
 		}
 		if (token.getType().equals(TagLineToken)) {
-			STACK.get().push(ScenarioDefinition.class);
-			STACK.get().consume(token);
+			if (lookahead_0(token))
+			{
+			stackHandler.push(Scenario.class);
+			stackHandler.consume(token);
 			return 6;
+			}
+		}
+		if (token.getType().equals(TagLineToken)) {
+			if (lookahead_1(token))
+			{
+			stackHandler.push(ScenarioOutline.class);
+			stackHandler.consume(token);
+			return 10;
+			}
 		}
 		if (token.getType().equals(ScenarioLineToken)) {
-			STACK.get().push(ScenarioDefinition.class);
-			STACK.get().push(Scenario.class);
-			STACK.get().consume(token);
+			stackHandler.push(Scenario.class);
+			stackHandler.consume(token);
 			return 7;
 		}
 		if (token.getType().equals(ScenarioOutlineLineToken)) {
-			STACK.get().push(ScenarioDefinition.class);
-			STACK.get().push(ScenarioOutline.class);
-			STACK.get().consume(token);
-			return 10;
+			stackHandler.push(ScenarioOutline.class);
+			stackHandler.consume(token);
+			return 11;
 		}
 		if (token.getType().equals(OtherToken)) {
-			STACK.get().consume(token);
+			stackHandler.consume(token);
 			return 2;
 		}
 		throw new IllegalStateException();
 	}
 
-	// GherkinDocument:0>Feature:4>Background:0>#BackgroundLine:0
+	// Feature:4>Background:0>#BackgroundLine:0
 	private int matchTokenAt_3(Token token) {
 		if (token.getType().equals(EOFToken)) {
-			STACK.get().collapse(Background.class);
-			STACK.get().collapse(Feature.class);
-			STACK.get().consume(token);
-			return 16;
+			stackHandler.collapse(Background.class);
+			stackHandler.consume(token);
+			return 17;
 		}
 		if (token.getType().equals(StepLineToken)) {
-			STACK.get().push(Step.class);
-			STACK.get().consume(token);
+			stackHandler.push(Step.class);
+			stackHandler.consume(token);
 			return 4;
 		}
 		if (token.getType().equals(TagLineToken)) {
-			STACK.get().collapse(Background.class);
-			STACK.get().push(ScenarioDefinition.class);
-			STACK.get().consume(token);
+			if (lookahead_0(token))
+			{
+			stackHandler.collapse(Background.class);
+			stackHandler.push(Scenario.class);
+			stackHandler.consume(token);
 			return 6;
+			}
+		}
+		if (token.getType().equals(TagLineToken)) {
+			if (lookahead_1(token))
+			{
+			stackHandler.collapse(Background.class);
+			stackHandler.push(ScenarioOutline.class);
+			stackHandler.consume(token);
+			return 10;
+			}
 		}
 		if (token.getType().equals(ScenarioLineToken)) {
-			STACK.get().collapse(Background.class);
-			STACK.get().push(ScenarioDefinition.class);
-			STACK.get().push(Scenario.class);
-			STACK.get().consume(token);
+			stackHandler.collapse(Background.class);
+			stackHandler.push(Scenario.class);
+			stackHandler.consume(token);
 			return 7;
 		}
 		if (token.getType().equals(ScenarioOutlineLineToken)) {
-			STACK.get().collapse(Background.class);
-			STACK.get().push(ScenarioDefinition.class);
-			STACK.get().push(ScenarioOutline.class);
-			STACK.get().consume(token);
-			return 10;
+			stackHandler.collapse(Background.class);
+			stackHandler.push(ScenarioOutline.class);
+			stackHandler.consume(token);
+			return 11;
 		}
 		if (token.getType().equals(OtherToken)) {
-			STACK.get().consume(token);
+			stackHandler.consume(token);
 			return 3;
 		}
 		throw new IllegalStateException();
 	}
 
-	// GherkinDocument:0>Feature:4>Background:2>Step:0>#StepLine:0
+	// Feature:4>Background:2>Step:0>#StepLine:0
 	private int matchTokenAt_4(Token token) {
 		if (token.getType().equals(EOFToken)) {
-			STACK.get().collapse(Step.class);
-			STACK.get().collapse(Background.class);
-			STACK.get().collapse(Feature.class);
-			STACK.get().consume(token);
-			return 16;
+			stackHandler.collapse(Step.class);
+			stackHandler.collapse(Background.class);
+			stackHandler.consume(token);
+			return 17;
 		}
 		if (token.getType().equals(TableRowToken)) {
-			STACK.get().push(DataTable.class);
-			STACK.get().consume(token);
+			stackHandler.push(DataTable.class);
+			stackHandler.consume(token);
 			return 5;
 		}
 		if (token.getType().equals(DocStringSeparatorToken)) {
-			STACK.get().push(DocString.class);
-			STACK.get().consume(token);
-			return 21;
+			stackHandler.push(DocString.class);
+			stackHandler.consume(token);
+			return 22;
 		}
 		if (token.getType().equals(StepLineToken)) {
-			STACK.get().collapse(Step.class);
-			STACK.get().push(Step.class);
-			STACK.get().consume(token);
+			stackHandler.collapse(Step.class);
+			stackHandler.push(Step.class);
+			stackHandler.consume(token);
 			return 4;
 		}
 		if (token.getType().equals(TagLineToken)) {
-			STACK.get().collapse(Step.class);
-			STACK.get().collapse(Background.class);
-			STACK.get().push(ScenarioDefinition.class);
-			STACK.get().consume(token);
+			if (lookahead_0(token))
+			{
+			stackHandler.collapse(Step.class);
+			stackHandler.collapse(Background.class);
+			stackHandler.push(Scenario.class);
+			stackHandler.consume(token);
 			return 6;
+			}
+		}
+		if (token.getType().equals(TagLineToken)) {
+			if (lookahead_1(token))
+			{
+			stackHandler.collapse(Step.class);
+			stackHandler.collapse(Background.class);
+			stackHandler.push(ScenarioOutline.class);
+			stackHandler.consume(token);
+			return 10;
+			}
 		}
 		if (token.getType().equals(ScenarioLineToken)) {
-			STACK.get().collapse(Step.class);
-			STACK.get().collapse(Background.class);
-			STACK.get().push(ScenarioDefinition.class);
-			STACK.get().push(Scenario.class);
-			STACK.get().consume(token);
+			stackHandler.collapse(Step.class);
+			stackHandler.collapse(Background.class);
+			stackHandler.push(Scenario.class);
+			stackHandler.consume(token);
 			return 7;
 		}
 		if (token.getType().equals(ScenarioOutlineLineToken)) {
-			STACK.get().collapse(Step.class);
-			STACK.get().collapse(Background.class);
-			STACK.get().push(ScenarioDefinition.class);
-			STACK.get().push(ScenarioOutline.class);
-			STACK.get().consume(token);
-			return 10;
+			stackHandler.collapse(Step.class);
+			stackHandler.collapse(Background.class);
+			stackHandler.push(ScenarioOutline.class);
+			stackHandler.consume(token);
+			return 11;
 		}
 		if (token.getType().equals(CommentToken)) {
-			STACK.get().consume(token);
+			stackHandler.consume(token);
 			return 4;
 		}
 		if (token.getType().equals(EmptyToken)) {
-			STACK.get().consume(token);
+			stackHandler.consume(token);
 			return 4;
 		}
 		throw new IllegalStateException();
 	}
 
-	// GherkinDocument:0>Feature:4>Background:2>Step:1>__alt1:0>DataTable:0>#TableRow:0
+	// Feature:4>Background:2>Step:1>__alt1:0>DataTable:0>#TableRow:0
 	private int matchTokenAt_5(Token token) {
 		if (token.getType().equals(EOFToken)) {
-			STACK.get().collapse(DataTable.class);
-			STACK.get().collapse(Step.class);
-			STACK.get().collapse(Background.class);
-			STACK.get().collapse(Feature.class);
-			STACK.get().consume(token);
-			return 16;
+			stackHandler.collapse(DataTable.class);
+			stackHandler.collapse(Step.class);
+			stackHandler.collapse(Background.class);
+			stackHandler.consume(token);
+			return 17;
 		}
 		if (token.getType().equals(TableRowToken)) {
-			STACK.get().consume(token);
+			stackHandler.consume(token);
 			return 5;
 		}
 		if (token.getType().equals(StepLineToken)) {
-			STACK.get().collapse(DataTable.class);
-			STACK.get().collapse(Step.class);
-			STACK.get().push(Step.class);
-			STACK.get().consume(token);
+			stackHandler.collapse(DataTable.class);
+			stackHandler.collapse(Step.class);
+			stackHandler.push(Step.class);
+			stackHandler.consume(token);
 			return 4;
 		}
 		if (token.getType().equals(TagLineToken)) {
-			STACK.get().collapse(DataTable.class);
-			STACK.get().collapse(Step.class);
-			STACK.get().collapse(Background.class);
-			STACK.get().push(ScenarioDefinition.class);
-			STACK.get().consume(token);
+			if (lookahead_0(token))
+			{
+			stackHandler.collapse(DataTable.class);
+			stackHandler.collapse(Step.class);
+			stackHandler.collapse(Background.class);
+			stackHandler.push(Scenario.class);
+			stackHandler.consume(token);
 			return 6;
+			}
+		}
+		if (token.getType().equals(TagLineToken)) {
+			if (lookahead_1(token))
+			{
+			stackHandler.collapse(DataTable.class);
+			stackHandler.collapse(Step.class);
+			stackHandler.collapse(Background.class);
+			stackHandler.push(ScenarioOutline.class);
+			stackHandler.consume(token);
+			return 10;
+			}
 		}
 		if (token.getType().equals(ScenarioLineToken)) {
-			STACK.get().collapse(DataTable.class);
-			STACK.get().collapse(Step.class);
-			STACK.get().collapse(Background.class);
-			STACK.get().push(ScenarioDefinition.class);
-			STACK.get().push(Scenario.class);
-			STACK.get().consume(token);
+			stackHandler.collapse(DataTable.class);
+			stackHandler.collapse(Step.class);
+			stackHandler.collapse(Background.class);
+			stackHandler.push(Scenario.class);
+			stackHandler.consume(token);
 			return 7;
 		}
 		if (token.getType().equals(ScenarioOutlineLineToken)) {
-			STACK.get().collapse(DataTable.class);
-			STACK.get().collapse(Step.class);
-			STACK.get().collapse(Background.class);
-			STACK.get().push(ScenarioDefinition.class);
-			STACK.get().push(ScenarioOutline.class);
-			STACK.get().consume(token);
-			return 10;
+			stackHandler.collapse(DataTable.class);
+			stackHandler.collapse(Step.class);
+			stackHandler.collapse(Background.class);
+			stackHandler.push(ScenarioOutline.class);
+			stackHandler.consume(token);
+			return 11;
 		}
 		if (token.getType().equals(CommentToken)) {
-			STACK.get().consume(token);
+			stackHandler.consume(token);
 			return 5;
 		}
 		if (token.getType().equals(EmptyToken)) {
-			STACK.get().consume(token);
+			stackHandler.consume(token);
 			return 5;
 		}
 		throw new IllegalStateException();
 	}
 
-	// GherkinDocument:0>Feature:5>ScenarioDefinition:0>#TagLine:0
+	// Feature:5>__alt0:0>Scenario:0>#TagLine:0
 	private int matchTokenAt_6(Token token) {
 		if (token.getType().equals(TagLineToken)) {
-			STACK.get().consume(token);
+			stackHandler.consume(token);
 			return 6;
 		}
 		if (token.getType().equals(ScenarioLineToken)) {
-			STACK.get().push(Scenario.class);
-			STACK.get().consume(token);
+			stackHandler.consume(token);
 			return 7;
 		}
-		if (token.getType().equals(ScenarioOutlineLineToken)) {
-			STACK.get().push(ScenarioOutline.class);
-			STACK.get().consume(token);
-			return 10;
-		}
 		if (token.getType().equals(CommentToken)) {
-			STACK.get().consume(token);
+			stackHandler.consume(token);
 			return 6;
 		}
 		if (token.getType().equals(EmptyToken)) {
-			STACK.get().consume(token);
+			stackHandler.consume(token);
 			return 6;
 		}
 		throw new IllegalStateException();
 	}
 
-	// GherkinDocument:0>Feature:5>ScenarioDefinition:1>__alt0:0>Scenario:0>#ScenarioLine:0
+	// Feature:5>__alt0:0>Scenario:1>#ScenarioLine:0
 	private int matchTokenAt_7(Token token) {
 		if (token.getType().equals(EOFToken)) {
-			STACK.get().collapse(Scenario.class);
-			STACK.get().collapse(ScenarioDefinition.class);
-			STACK.get().collapse(Feature.class);
-			STACK.get().consume(token);
-			return 16;
+			stackHandler.collapse(Scenario.class);
+			stackHandler.consume(token);
+			return 17;
 		}
 		if (token.getType().equals(StepLineToken)) {
-			STACK.get().push(Step.class);
-			STACK.get().consume(token);
+			stackHandler.push(Step.class);
+			stackHandler.consume(token);
 			return 8;
 		}
 		if (token.getType().equals(TagLineToken)) {
-			STACK.get().collapse(Scenario.class);
-			STACK.get().collapse(ScenarioDefinition.class);
-			STACK.get().push(ScenarioDefinition.class);
-			STACK.get().consume(token);
+			if (lookahead_0(token))
+			{
+			stackHandler.collapse(Scenario.class);
+			stackHandler.push(Scenario.class);
+			stackHandler.consume(token);
 			return 6;
+			}
+		}
+		if (token.getType().equals(TagLineToken)) {
+			if (lookahead_1(token))
+			{
+			stackHandler.collapse(Scenario.class);
+			stackHandler.push(ScenarioOutline.class);
+			stackHandler.consume(token);
+			return 10;
+			}
 		}
 		if (token.getType().equals(ScenarioLineToken)) {
-			STACK.get().collapse(Scenario.class);
-			STACK.get().collapse(ScenarioDefinition.class);
-			STACK.get().push(ScenarioDefinition.class);
-			STACK.get().push(Scenario.class);
-			STACK.get().consume(token);
+			stackHandler.collapse(Scenario.class);
+			stackHandler.push(Scenario.class);
+			stackHandler.consume(token);
 			return 7;
 		}
 		if (token.getType().equals(ScenarioOutlineLineToken)) {
-			STACK.get().collapse(Scenario.class);
-			STACK.get().collapse(ScenarioDefinition.class);
-			STACK.get().push(ScenarioDefinition.class);
-			STACK.get().push(ScenarioOutline.class);
-			STACK.get().consume(token);
-			return 10;
+			stackHandler.collapse(Scenario.class);
+			stackHandler.push(ScenarioOutline.class);
+			stackHandler.consume(token);
+			return 11;
 		}
 		if (token.getType().equals(OtherToken)) {
-			STACK.get().consume(token);
+			stackHandler.consume(token);
 			return 7;
 		}
 		throw new IllegalStateException();
 	}
 
-	// GherkinDocument:0>Feature:5>ScenarioDefinition:1>__alt0:0>Scenario:2>Step:0>#StepLine:0
+	// Feature:5>__alt0:0>Scenario:3>Step:0>#StepLine:0
 	private int matchTokenAt_8(Token token) {
 		if (token.getType().equals(EOFToken)) {
-			STACK.get().collapse(Step.class);
-			STACK.get().collapse(Scenario.class);
-			STACK.get().collapse(ScenarioDefinition.class);
-			STACK.get().collapse(Feature.class);
-			STACK.get().consume(token);
-			return 16;
+			stackHandler.collapse(Step.class);
+			stackHandler.collapse(Scenario.class);
+			stackHandler.consume(token);
+			return 17;
 		}
 		if (token.getType().equals(TableRowToken)) {
-			STACK.get().push(DataTable.class);
-			STACK.get().consume(token);
+			stackHandler.push(DataTable.class);
+			stackHandler.consume(token);
 			return 9;
 		}
 		if (token.getType().equals(DocStringSeparatorToken)) {
-			STACK.get().push(DocString.class);
-			STACK.get().consume(token);
-			return 19;
+			stackHandler.push(DocString.class);
+			stackHandler.consume(token);
+			return 20;
 		}
 		if (token.getType().equals(StepLineToken)) {
-			STACK.get().collapse(Step.class);
-			STACK.get().push(Step.class);
-			STACK.get().consume(token);
+			stackHandler.collapse(Step.class);
+			stackHandler.push(Step.class);
+			stackHandler.consume(token);
 			return 8;
 		}
 		if (token.getType().equals(TagLineToken)) {
-			STACK.get().collapse(Step.class);
-			STACK.get().collapse(Scenario.class);
-			STACK.get().collapse(ScenarioDefinition.class);
-			STACK.get().push(ScenarioDefinition.class);
-			STACK.get().consume(token);
+			if (lookahead_0(token))
+			{
+			stackHandler.collapse(Step.class);
+			stackHandler.collapse(Scenario.class);
+			stackHandler.push(Scenario.class);
+			stackHandler.consume(token);
 			return 6;
+			}
+		}
+		if (token.getType().equals(TagLineToken)) {
+			if (lookahead_1(token))
+			{
+			stackHandler.collapse(Step.class);
+			stackHandler.collapse(Scenario.class);
+			stackHandler.push(ScenarioOutline.class);
+			stackHandler.consume(token);
+			return 10;
+			}
 		}
 		if (token.getType().equals(ScenarioLineToken)) {
-			STACK.get().collapse(Step.class);
-			STACK.get().collapse(Scenario.class);
-			STACK.get().collapse(ScenarioDefinition.class);
-			STACK.get().push(ScenarioDefinition.class);
-			STACK.get().push(Scenario.class);
-			STACK.get().consume(token);
+			stackHandler.collapse(Step.class);
+			stackHandler.collapse(Scenario.class);
+			stackHandler.push(Scenario.class);
+			stackHandler.consume(token);
 			return 7;
 		}
 		if (token.getType().equals(ScenarioOutlineLineToken)) {
-			STACK.get().collapse(Step.class);
-			STACK.get().collapse(Scenario.class);
-			STACK.get().collapse(ScenarioDefinition.class);
-			STACK.get().push(ScenarioDefinition.class);
-			STACK.get().push(ScenarioOutline.class);
-			STACK.get().consume(token);
-			return 10;
+			stackHandler.collapse(Step.class);
+			stackHandler.collapse(Scenario.class);
+			stackHandler.push(ScenarioOutline.class);
+			stackHandler.consume(token);
+			return 11;
 		}
 		if (token.getType().equals(CommentToken)) {
-			STACK.get().consume(token);
+			stackHandler.consume(token);
 			return 8;
 		}
 		if (token.getType().equals(EmptyToken)) {
-			STACK.get().consume(token);
+			stackHandler.consume(token);
 			return 8;
 		}
 		throw new IllegalStateException();
 	}
 
-	// GherkinDocument:0>Feature:5>ScenarioDefinition:1>__alt0:0>Scenario:2>Step:1>__alt1:0>DataTable:0>#TableRow:0
+	// Feature:5>__alt0:0>Scenario:3>Step:1>__alt1:0>DataTable:0>#TableRow:0
 	private int matchTokenAt_9(Token token) {
 		if (token.getType().equals(EOFToken)) {
-			STACK.get().collapse(DataTable.class);
-			STACK.get().collapse(Step.class);
-			STACK.get().collapse(Scenario.class);
-			STACK.get().collapse(ScenarioDefinition.class);
-			STACK.get().collapse(Feature.class);
-			STACK.get().consume(token);
-			return 16;
+			stackHandler.collapse(DataTable.class);
+			stackHandler.collapse(Step.class);
+			stackHandler.collapse(Scenario.class);
+			stackHandler.consume(token);
+			return 17;
 		}
 		if (token.getType().equals(TableRowToken)) {
-			STACK.get().consume(token);
+			stackHandler.consume(token);
 			return 9;
 		}
 		if (token.getType().equals(StepLineToken)) {
-			STACK.get().collapse(DataTable.class);
-			STACK.get().collapse(Step.class);
-			STACK.get().push(Step.class);
-			STACK.get().consume(token);
+			stackHandler.collapse(DataTable.class);
+			stackHandler.collapse(Step.class);
+			stackHandler.push(Step.class);
+			stackHandler.consume(token);
 			return 8;
 		}
 		if (token.getType().equals(TagLineToken)) {
-			STACK.get().collapse(DataTable.class);
-			STACK.get().collapse(Step.class);
-			STACK.get().collapse(Scenario.class);
-			STACK.get().collapse(ScenarioDefinition.class);
-			STACK.get().push(ScenarioDefinition.class);
-			STACK.get().consume(token);
-			return 6;
-		}
-		if (token.getType().equals(ScenarioLineToken)) {
-			STACK.get().collapse(DataTable.class);
-			STACK.get().collapse(Step.class);
-			STACK.get().collapse(Scenario.class);
-			STACK.get().collapse(ScenarioDefinition.class);
-			STACK.get().push(ScenarioDefinition.class);
-			STACK.get().push(Scenario.class);
-			STACK.get().consume(token);
-			return 7;
-		}
-		if (token.getType().equals(ScenarioOutlineLineToken)) {
-			STACK.get().collapse(DataTable.class);
-			STACK.get().collapse(Step.class);
-			STACK.get().collapse(Scenario.class);
-			STACK.get().collapse(ScenarioDefinition.class);
-			STACK.get().push(ScenarioDefinition.class);
-			STACK.get().push(ScenarioOutline.class);
-			STACK.get().consume(token);
-			return 10;
-		}
-		if (token.getType().equals(CommentToken)) {
-			STACK.get().consume(token);
-			return 9;
-		}
-		if (token.getType().equals(EmptyToken)) {
-			STACK.get().consume(token);
-			return 9;
-		}
-		throw new IllegalStateException();
-	}
-
-	// GherkinDocument:0>Feature:5>ScenarioDefinition:1>__alt0:1>ScenarioOutline:0>#ScenarioOutlineLine:0
-	private int matchTokenAt_10(Token token) {
-		if (token.getType().equals(EOFToken)) {
-			STACK.get().collapse(ScenarioOutline.class);
-			STACK.get().collapse(ScenarioDefinition.class);
-			STACK.get().collapse(Feature.class);
-			STACK.get().consume(token);
-			return 16;
-		}
-		if (token.getType().equals(StepLineToken)) {
-			STACK.get().push(Step.class);
-			STACK.get().consume(token);
-			return 11;
-		}
-		if (token.getType().equals(TagLineToken)) {
 			if (lookahead_0(token))
 			{
-			STACK.get().push(ExamplesDefinition.class);
-			STACK.get().consume(token);
-			return 13;
+			stackHandler.collapse(DataTable.class);
+			stackHandler.collapse(Step.class);
+			stackHandler.collapse(Scenario.class);
+			stackHandler.push(Scenario.class);
+			stackHandler.consume(token);
+			return 6;
 			}
 		}
 		if (token.getType().equals(TagLineToken)) {
-			STACK.get().collapse(ScenarioOutline.class);
-			STACK.get().collapse(ScenarioDefinition.class);
-			STACK.get().push(ScenarioDefinition.class);
-			STACK.get().consume(token);
-			return 6;
-		}
-		if (token.getType().equals(ExamplesLineToken)) {
-			STACK.get().push(ExamplesDefinition.class);
-			STACK.get().push(Examples.class);
-			STACK.get().consume(token);
-			return 14;
+			if (lookahead_1(token))
+			{
+			stackHandler.collapse(DataTable.class);
+			stackHandler.collapse(Step.class);
+			stackHandler.collapse(Scenario.class);
+			stackHandler.push(ScenarioOutline.class);
+			stackHandler.consume(token);
+			return 10;
+			}
 		}
 		if (token.getType().equals(ScenarioLineToken)) {
-			STACK.get().collapse(ScenarioOutline.class);
-			STACK.get().collapse(ScenarioDefinition.class);
-			STACK.get().push(ScenarioDefinition.class);
-			STACK.get().push(Scenario.class);
-			STACK.get().consume(token);
+			stackHandler.collapse(DataTable.class);
+			stackHandler.collapse(Step.class);
+			stackHandler.collapse(Scenario.class);
+			stackHandler.push(Scenario.class);
+			stackHandler.consume(token);
 			return 7;
 		}
 		if (token.getType().equals(ScenarioOutlineLineToken)) {
-			STACK.get().collapse(ScenarioOutline.class);
-			STACK.get().collapse(ScenarioDefinition.class);
-			STACK.get().push(ScenarioDefinition.class);
-			STACK.get().push(ScenarioOutline.class);
-			STACK.get().consume(token);
+			stackHandler.collapse(DataTable.class);
+			stackHandler.collapse(Step.class);
+			stackHandler.collapse(Scenario.class);
+			stackHandler.push(ScenarioOutline.class);
+			stackHandler.consume(token);
+			return 11;
+		}
+		if (token.getType().equals(CommentToken)) {
+			stackHandler.consume(token);
+			return 9;
+		}
+		if (token.getType().equals(EmptyToken)) {
+			stackHandler.consume(token);
+			return 9;
+		}
+		throw new IllegalStateException();
+	}
+
+	// Feature:5>__alt0:1>ScenarioOutline:0>#TagLine:0
+	private int matchTokenAt_10(Token token) {
+		if (token.getType().equals(TagLineToken)) {
+			stackHandler.consume(token);
 			return 10;
 		}
-		if (token.getType().equals(OtherToken)) {
-			STACK.get().consume(token);
+		if (token.getType().equals(ScenarioOutlineLineToken)) {
+			stackHandler.consume(token);
+			return 11;
+		}
+		if (token.getType().equals(CommentToken)) {
+			stackHandler.consume(token);
+			return 10;
+		}
+		if (token.getType().equals(EmptyToken)) {
+			stackHandler.consume(token);
 			return 10;
 		}
 		throw new IllegalStateException();
 	}
 
-	// GherkinDocument:0>Feature:5>ScenarioDefinition:1>__alt0:1>ScenarioOutline:2>Step:0>#StepLine:0
+	// Feature:5>__alt0:1>ScenarioOutline:1>#ScenarioOutlineLine:0
 	private int matchTokenAt_11(Token token) {
 		if (token.getType().equals(EOFToken)) {
-			STACK.get().collapse(Step.class);
-			STACK.get().collapse(ScenarioOutline.class);
-			STACK.get().collapse(ScenarioDefinition.class);
-			STACK.get().collapse(Feature.class);
-			STACK.get().consume(token);
-			return 16;
-		}
-		if (token.getType().equals(TableRowToken)) {
-			STACK.get().push(DataTable.class);
-			STACK.get().consume(token);
-			return 12;
-		}
-		if (token.getType().equals(DocStringSeparatorToken)) {
-			STACK.get().push(DocString.class);
-			STACK.get().consume(token);
+			stackHandler.collapse(ScenarioOutline.class);
+			stackHandler.consume(token);
 			return 17;
 		}
 		if (token.getType().equals(StepLineToken)) {
-			STACK.get().collapse(Step.class);
-			STACK.get().push(Step.class);
-			STACK.get().consume(token);
-			return 11;
+			stackHandler.push(Step.class);
+			stackHandler.consume(token);
+			return 12;
+		}
+		if (token.getType().equals(TagLineToken)) {
+			if (lookahead_2(token))
+			{
+			stackHandler.push(ExamplesDefinition.class);
+			stackHandler.consume(token);
+			return 14;
+			}
 		}
 		if (token.getType().equals(TagLineToken)) {
 			if (lookahead_0(token))
 			{
-			STACK.get().collapse(Step.class);
-			STACK.get().push(ExamplesDefinition.class);
-			STACK.get().consume(token);
-			return 13;
+			stackHandler.collapse(ScenarioOutline.class);
+			stackHandler.push(Scenario.class);
+			stackHandler.consume(token);
+			return 6;
 			}
 		}
 		if (token.getType().equals(TagLineToken)) {
-			STACK.get().collapse(Step.class);
-			STACK.get().collapse(ScenarioOutline.class);
-			STACK.get().collapse(ScenarioDefinition.class);
-			STACK.get().push(ScenarioDefinition.class);
-			STACK.get().consume(token);
-			return 6;
+			if (lookahead_1(token))
+			{
+			stackHandler.collapse(ScenarioOutline.class);
+			stackHandler.push(ScenarioOutline.class);
+			stackHandler.consume(token);
+			return 10;
+			}
 		}
 		if (token.getType().equals(ExamplesLineToken)) {
-			STACK.get().collapse(Step.class);
-			STACK.get().push(ExamplesDefinition.class);
-			STACK.get().push(Examples.class);
-			STACK.get().consume(token);
-			return 14;
+			stackHandler.push(ExamplesDefinition.class);
+			stackHandler.push(Examples.class);
+			stackHandler.consume(token);
+			return 15;
 		}
 		if (token.getType().equals(ScenarioLineToken)) {
-			STACK.get().collapse(Step.class);
-			STACK.get().collapse(ScenarioOutline.class);
-			STACK.get().collapse(ScenarioDefinition.class);
-			STACK.get().push(ScenarioDefinition.class);
-			STACK.get().push(Scenario.class);
-			STACK.get().consume(token);
+			stackHandler.collapse(ScenarioOutline.class);
+			stackHandler.push(Scenario.class);
+			stackHandler.consume(token);
 			return 7;
 		}
 		if (token.getType().equals(ScenarioOutlineLineToken)) {
-			STACK.get().collapse(Step.class);
-			STACK.get().collapse(ScenarioOutline.class);
-			STACK.get().collapse(ScenarioDefinition.class);
-			STACK.get().push(ScenarioDefinition.class);
-			STACK.get().push(ScenarioOutline.class);
-			STACK.get().consume(token);
-			return 10;
-		}
-		if (token.getType().equals(CommentToken)) {
-			STACK.get().consume(token);
+			stackHandler.collapse(ScenarioOutline.class);
+			stackHandler.push(ScenarioOutline.class);
+			stackHandler.consume(token);
 			return 11;
 		}
-		if (token.getType().equals(EmptyToken)) {
-			STACK.get().consume(token);
+		if (token.getType().equals(OtherToken)) {
+			stackHandler.consume(token);
 			return 11;
 		}
 		throw new IllegalStateException();
 	}
 
-	// GherkinDocument:0>Feature:5>ScenarioDefinition:1>__alt0:1>ScenarioOutline:2>Step:1>__alt1:0>DataTable:0>#TableRow:0
+	// Feature:5>__alt0:1>ScenarioOutline:3>Step:0>#StepLine:0
 	private int matchTokenAt_12(Token token) {
 		if (token.getType().equals(EOFToken)) {
-			STACK.get().collapse(DataTable.class);
-			STACK.get().collapse(Step.class);
-			STACK.get().collapse(ScenarioOutline.class);
-			STACK.get().collapse(ScenarioDefinition.class);
-			STACK.get().collapse(Feature.class);
-			STACK.get().consume(token);
-			return 16;
-		}
-		if (token.getType().equals(TableRowToken)) {
-			STACK.get().consume(token);
-			return 12;
-		}
-		if (token.getType().equals(StepLineToken)) {
-			STACK.get().collapse(DataTable.class);
-			STACK.get().collapse(Step.class);
-			STACK.get().push(Step.class);
-			STACK.get().consume(token);
-			return 11;
-		}
-		if (token.getType().equals(TagLineToken)) {
-			if (lookahead_0(token))
-			{
-			STACK.get().collapse(DataTable.class);
-			STACK.get().collapse(Step.class);
-			STACK.get().push(ExamplesDefinition.class);
-			STACK.get().consume(token);
-			return 13;
-			}
-		}
-		if (token.getType().equals(TagLineToken)) {
-			STACK.get().collapse(DataTable.class);
-			STACK.get().collapse(Step.class);
-			STACK.get().collapse(ScenarioOutline.class);
-			STACK.get().collapse(ScenarioDefinition.class);
-			STACK.get().push(ScenarioDefinition.class);
-			STACK.get().consume(token);
-			return 6;
-		}
-		if (token.getType().equals(ExamplesLineToken)) {
-			STACK.get().collapse(DataTable.class);
-			STACK.get().collapse(Step.class);
-			STACK.get().push(ExamplesDefinition.class);
-			STACK.get().push(Examples.class);
-			STACK.get().consume(token);
-			return 14;
-		}
-		if (token.getType().equals(ScenarioLineToken)) {
-			STACK.get().collapse(DataTable.class);
-			STACK.get().collapse(Step.class);
-			STACK.get().collapse(ScenarioOutline.class);
-			STACK.get().collapse(ScenarioDefinition.class);
-			STACK.get().push(ScenarioDefinition.class);
-			STACK.get().push(Scenario.class);
-			STACK.get().consume(token);
-			return 7;
-		}
-		if (token.getType().equals(ScenarioOutlineLineToken)) {
-			STACK.get().collapse(DataTable.class);
-			STACK.get().collapse(Step.class);
-			STACK.get().collapse(ScenarioOutline.class);
-			STACK.get().collapse(ScenarioDefinition.class);
-			STACK.get().push(ScenarioDefinition.class);
-			STACK.get().push(ScenarioOutline.class);
-			STACK.get().consume(token);
-			return 10;
-		}
-		if (token.getType().equals(CommentToken)) {
-			STACK.get().consume(token);
-			return 12;
-		}
-		if (token.getType().equals(EmptyToken)) {
-			STACK.get().consume(token);
-			return 12;
-		}
-		throw new IllegalStateException();
-	}
-
-	// GherkinDocument:0>Feature:5>ScenarioDefinition:1>__alt0:1>ScenarioOutline:3>ExamplesDefinition:0>#TagLine:0
-	private int matchTokenAt_13(Token token) {
-		if (token.getType().equals(TagLineToken)) {
-			STACK.get().consume(token);
-			return 13;
-		}
-		if (token.getType().equals(ExamplesLineToken)) {
-			STACK.get().push(Examples.class);
-			STACK.get().consume(token);
-			return 14;
-		}
-		if (token.getType().equals(CommentToken)) {
-			STACK.get().consume(token);
-			return 13;
-		}
-		if (token.getType().equals(EmptyToken)) {
-			STACK.get().consume(token);
-			return 13;
-		}
-		throw new IllegalStateException();
-	}
-
-	// GherkinDocument:0>Feature:5>ScenarioDefinition:1>__alt0:1>ScenarioOutline:3>ExamplesDefinition:1>Examples:0>#ExamplesLine:0
-	private int matchTokenAt_14(Token token) {
-		if (token.getType().equals(EOFToken)) {
-			STACK.get().collapse(Examples.class);
-			STACK.get().collapse(ExamplesDefinition.class);
-			STACK.get().collapse(ScenarioOutline.class);
-			STACK.get().collapse(ScenarioDefinition.class);
-			STACK.get().collapse(Feature.class);
-			STACK.get().consume(token);
-			return 16;
-		}
-		if (token.getType().equals(TableRowToken)) {
-			STACK.get().push(ExamplesTable.class);
-			STACK.get().consume(token);
-			return 15;
-		}
-		if (token.getType().equals(TagLineToken)) {
-			if (lookahead_0(token))
-			{
-			STACK.get().collapse(Examples.class);
-			STACK.get().collapse(ExamplesDefinition.class);
-			STACK.get().push(ExamplesDefinition.class);
-			STACK.get().consume(token);
-			return 13;
-			}
-		}
-		if (token.getType().equals(TagLineToken)) {
-			STACK.get().collapse(Examples.class);
-			STACK.get().collapse(ExamplesDefinition.class);
-			STACK.get().collapse(ScenarioOutline.class);
-			STACK.get().collapse(ScenarioDefinition.class);
-			STACK.get().push(ScenarioDefinition.class);
-			STACK.get().consume(token);
-			return 6;
-		}
-		if (token.getType().equals(ExamplesLineToken)) {
-			STACK.get().collapse(Examples.class);
-			STACK.get().collapse(ExamplesDefinition.class);
-			STACK.get().push(ExamplesDefinition.class);
-			STACK.get().push(Examples.class);
-			STACK.get().consume(token);
-			return 14;
-		}
-		if (token.getType().equals(ScenarioLineToken)) {
-			STACK.get().collapse(Examples.class);
-			STACK.get().collapse(ExamplesDefinition.class);
-			STACK.get().collapse(ScenarioOutline.class);
-			STACK.get().collapse(ScenarioDefinition.class);
-			STACK.get().push(ScenarioDefinition.class);
-			STACK.get().push(Scenario.class);
-			STACK.get().consume(token);
-			return 7;
-		}
-		if (token.getType().equals(ScenarioOutlineLineToken)) {
-			STACK.get().collapse(Examples.class);
-			STACK.get().collapse(ExamplesDefinition.class);
-			STACK.get().collapse(ScenarioOutline.class);
-			STACK.get().collapse(ScenarioDefinition.class);
-			STACK.get().push(ScenarioDefinition.class);
-			STACK.get().push(ScenarioOutline.class);
-			STACK.get().consume(token);
-			return 10;
-		}
-		if (token.getType().equals(OtherToken)) {
-			STACK.get().consume(token);
-			return 14;
-		}
-		throw new IllegalStateException();
-	}
-
-	// GherkinDocument:0>Feature:5>ScenarioDefinition:1>__alt0:1>ScenarioOutline:3>ExamplesDefinition:1>Examples:2>ExamplesTable:0>#TableRow:0
-	private int matchTokenAt_15(Token token) {
-		if (token.getType().equals(EOFToken)) {
-			STACK.get().collapse(ExamplesTable.class);
-			STACK.get().collapse(Examples.class);
-			STACK.get().collapse(ExamplesDefinition.class);
-			STACK.get().collapse(ScenarioOutline.class);
-			STACK.get().collapse(ScenarioDefinition.class);
-			STACK.get().collapse(Feature.class);
-			STACK.get().consume(token);
-			return 16;
-		}
-		if (token.getType().equals(TableRowToken)) {
-			STACK.get().consume(token);
-			return 15;
-		}
-		if (token.getType().equals(TagLineToken)) {
-			if (lookahead_0(token))
-			{
-			STACK.get().collapse(ExamplesTable.class);
-			STACK.get().collapse(Examples.class);
-			STACK.get().collapse(ExamplesDefinition.class);
-			STACK.get().push(ExamplesDefinition.class);
-			STACK.get().consume(token);
-			return 13;
-			}
-		}
-		if (token.getType().equals(TagLineToken)) {
-			STACK.get().collapse(ExamplesTable.class);
-			STACK.get().collapse(Examples.class);
-			STACK.get().collapse(ExamplesDefinition.class);
-			STACK.get().collapse(ScenarioOutline.class);
-			STACK.get().collapse(ScenarioDefinition.class);
-			STACK.get().push(ScenarioDefinition.class);
-			STACK.get().consume(token);
-			return 6;
-		}
-		if (token.getType().equals(ExamplesLineToken)) {
-			STACK.get().collapse(ExamplesTable.class);
-			STACK.get().collapse(Examples.class);
-			STACK.get().collapse(ExamplesDefinition.class);
-			STACK.get().push(ExamplesDefinition.class);
-			STACK.get().push(Examples.class);
-			STACK.get().consume(token);
-			return 14;
-		}
-		if (token.getType().equals(ScenarioLineToken)) {
-			STACK.get().collapse(ExamplesTable.class);
-			STACK.get().collapse(Examples.class);
-			STACK.get().collapse(ExamplesDefinition.class);
-			STACK.get().collapse(ScenarioOutline.class);
-			STACK.get().collapse(ScenarioDefinition.class);
-			STACK.get().push(ScenarioDefinition.class);
-			STACK.get().push(Scenario.class);
-			STACK.get().consume(token);
-			return 7;
-		}
-		if (token.getType().equals(ScenarioOutlineLineToken)) {
-			STACK.get().collapse(ExamplesTable.class);
-			STACK.get().collapse(Examples.class);
-			STACK.get().collapse(ExamplesDefinition.class);
-			STACK.get().collapse(ScenarioOutline.class);
-			STACK.get().collapse(ScenarioDefinition.class);
-			STACK.get().push(ScenarioDefinition.class);
-			STACK.get().push(ScenarioOutline.class);
-			STACK.get().consume(token);
-			return 10;
-		}
-		if (token.getType().equals(CommentToken)) {
-			STACK.get().consume(token);
-			return 15;
-		}
-		if (token.getType().equals(EmptyToken)) {
-			STACK.get().consume(token);
-			return 15;
-		}
-		throw new IllegalStateException();
-	}
-
-	// GherkinDocument:0>Feature:5>ScenarioDefinition:1>__alt0:1>ScenarioOutline:2>Step:1>__alt1:1>DocString:0>#DocStringSeparator:0
-	private int matchTokenAt_17(Token token) {
-		if (token.getType().equals(DocStringSeparatorToken)) {
-			STACK.get().consume(token);
-			return 18;
-		}
-		if (token.getType().equals(OtherToken)) {
-			STACK.get().consume(token);
+			stackHandler.collapse(Step.class);
+			stackHandler.collapse(ScenarioOutline.class);
+			stackHandler.consume(token);
 			return 17;
 		}
-		throw new IllegalStateException();
-	}
-
-	// GherkinDocument:0>Feature:5>ScenarioDefinition:1>__alt0:1>ScenarioOutline:2>Step:1>__alt1:1>DocString:2>#DocStringSeparator:0
-	private int matchTokenAt_18(Token token) {
-		if (token.getType().equals(EOFToken)) {
-			STACK.get().collapse(DocString.class);
-			STACK.get().collapse(Step.class);
-			STACK.get().collapse(ScenarioOutline.class);
-			STACK.get().collapse(ScenarioDefinition.class);
-			STACK.get().collapse(Feature.class);
-			STACK.get().consume(token);
-			return 16;
+		if (token.getType().equals(TableRowToken)) {
+			stackHandler.push(DataTable.class);
+			stackHandler.consume(token);
+			return 13;
+		}
+		if (token.getType().equals(DocStringSeparatorToken)) {
+			stackHandler.push(DocString.class);
+			stackHandler.consume(token);
+			return 18;
 		}
 		if (token.getType().equals(StepLineToken)) {
-			STACK.get().collapse(DocString.class);
-			STACK.get().collapse(Step.class);
-			STACK.get().push(Step.class);
-			STACK.get().consume(token);
-			return 11;
+			stackHandler.collapse(Step.class);
+			stackHandler.push(Step.class);
+			stackHandler.consume(token);
+			return 12;
+		}
+		if (token.getType().equals(TagLineToken)) {
+			if (lookahead_2(token))
+			{
+			stackHandler.collapse(Step.class);
+			stackHandler.push(ExamplesDefinition.class);
+			stackHandler.consume(token);
+			return 14;
+			}
 		}
 		if (token.getType().equals(TagLineToken)) {
 			if (lookahead_0(token))
 			{
-			STACK.get().collapse(DocString.class);
-			STACK.get().collapse(Step.class);
-			STACK.get().push(ExamplesDefinition.class);
-			STACK.get().consume(token);
-			return 13;
+			stackHandler.collapse(Step.class);
+			stackHandler.collapse(ScenarioOutline.class);
+			stackHandler.push(Scenario.class);
+			stackHandler.consume(token);
+			return 6;
 			}
 		}
 		if (token.getType().equals(TagLineToken)) {
-			STACK.get().collapse(DocString.class);
-			STACK.get().collapse(Step.class);
-			STACK.get().collapse(ScenarioOutline.class);
-			STACK.get().collapse(ScenarioDefinition.class);
-			STACK.get().push(ScenarioDefinition.class);
-			STACK.get().consume(token);
-			return 6;
+			if (lookahead_1(token))
+			{
+			stackHandler.collapse(Step.class);
+			stackHandler.collapse(ScenarioOutline.class);
+			stackHandler.push(ScenarioOutline.class);
+			stackHandler.consume(token);
+			return 10;
+			}
 		}
 		if (token.getType().equals(ExamplesLineToken)) {
-			STACK.get().collapse(DocString.class);
-			STACK.get().collapse(Step.class);
-			STACK.get().push(ExamplesDefinition.class);
-			STACK.get().push(Examples.class);
-			STACK.get().consume(token);
-			return 14;
+			stackHandler.collapse(Step.class);
+			stackHandler.push(ExamplesDefinition.class);
+			stackHandler.push(Examples.class);
+			stackHandler.consume(token);
+			return 15;
 		}
 		if (token.getType().equals(ScenarioLineToken)) {
-			STACK.get().collapse(DocString.class);
-			STACK.get().collapse(Step.class);
-			STACK.get().collapse(ScenarioOutline.class);
-			STACK.get().collapse(ScenarioDefinition.class);
-			STACK.get().push(ScenarioDefinition.class);
-			STACK.get().push(Scenario.class);
-			STACK.get().consume(token);
+			stackHandler.collapse(Step.class);
+			stackHandler.collapse(ScenarioOutline.class);
+			stackHandler.push(Scenario.class);
+			stackHandler.consume(token);
 			return 7;
 		}
 		if (token.getType().equals(ScenarioOutlineLineToken)) {
-			STACK.get().collapse(DocString.class);
-			STACK.get().collapse(Step.class);
-			STACK.get().collapse(ScenarioOutline.class);
-			STACK.get().collapse(ScenarioDefinition.class);
-			STACK.get().push(ScenarioDefinition.class);
-			STACK.get().push(ScenarioOutline.class);
-			STACK.get().consume(token);
-			return 10;
+			stackHandler.collapse(Step.class);
+			stackHandler.collapse(ScenarioOutline.class);
+			stackHandler.push(ScenarioOutline.class);
+			stackHandler.consume(token);
+			return 11;
 		}
 		if (token.getType().equals(CommentToken)) {
-			STACK.get().consume(token);
-			return 18;
+			stackHandler.consume(token);
+			return 12;
 		}
 		if (token.getType().equals(EmptyToken)) {
-			STACK.get().consume(token);
+			stackHandler.consume(token);
+			return 12;
+		}
+		throw new IllegalStateException();
+	}
+
+	// Feature:5>__alt0:1>ScenarioOutline:3>Step:1>__alt1:0>DataTable:0>#TableRow:0
+	private int matchTokenAt_13(Token token) {
+		if (token.getType().equals(EOFToken)) {
+			stackHandler.collapse(DataTable.class);
+			stackHandler.collapse(Step.class);
+			stackHandler.collapse(ScenarioOutline.class);
+			stackHandler.consume(token);
+			return 17;
+		}
+		if (token.getType().equals(TableRowToken)) {
+			stackHandler.consume(token);
+			return 13;
+		}
+		if (token.getType().equals(StepLineToken)) {
+			stackHandler.collapse(DataTable.class);
+			stackHandler.collapse(Step.class);
+			stackHandler.push(Step.class);
+			stackHandler.consume(token);
+			return 12;
+		}
+		if (token.getType().equals(TagLineToken)) {
+			if (lookahead_2(token))
+			{
+			stackHandler.collapse(DataTable.class);
+			stackHandler.collapse(Step.class);
+			stackHandler.push(ExamplesDefinition.class);
+			stackHandler.consume(token);
+			return 14;
+			}
+		}
+		if (token.getType().equals(TagLineToken)) {
+			if (lookahead_0(token))
+			{
+			stackHandler.collapse(DataTable.class);
+			stackHandler.collapse(Step.class);
+			stackHandler.collapse(ScenarioOutline.class);
+			stackHandler.push(Scenario.class);
+			stackHandler.consume(token);
+			return 6;
+			}
+		}
+		if (token.getType().equals(TagLineToken)) {
+			if (lookahead_1(token))
+			{
+			stackHandler.collapse(DataTable.class);
+			stackHandler.collapse(Step.class);
+			stackHandler.collapse(ScenarioOutline.class);
+			stackHandler.push(ScenarioOutline.class);
+			stackHandler.consume(token);
+			return 10;
+			}
+		}
+		if (token.getType().equals(ExamplesLineToken)) {
+			stackHandler.collapse(DataTable.class);
+			stackHandler.collapse(Step.class);
+			stackHandler.push(ExamplesDefinition.class);
+			stackHandler.push(Examples.class);
+			stackHandler.consume(token);
+			return 15;
+		}
+		if (token.getType().equals(ScenarioLineToken)) {
+			stackHandler.collapse(DataTable.class);
+			stackHandler.collapse(Step.class);
+			stackHandler.collapse(ScenarioOutline.class);
+			stackHandler.push(Scenario.class);
+			stackHandler.consume(token);
+			return 7;
+		}
+		if (token.getType().equals(ScenarioOutlineLineToken)) {
+			stackHandler.collapse(DataTable.class);
+			stackHandler.collapse(Step.class);
+			stackHandler.collapse(ScenarioOutline.class);
+			stackHandler.push(ScenarioOutline.class);
+			stackHandler.consume(token);
+			return 11;
+		}
+		if (token.getType().equals(CommentToken)) {
+			stackHandler.consume(token);
+			return 13;
+		}
+		if (token.getType().equals(EmptyToken)) {
+			stackHandler.consume(token);
+			return 13;
+		}
+		throw new IllegalStateException();
+	}
+
+	// Feature:5>__alt0:1>ScenarioOutline:4>ExamplesDefinition:0>#TagLine:0
+	private int matchTokenAt_14(Token token) {
+		if (token.getType().equals(TagLineToken)) {
+			stackHandler.consume(token);
+			return 14;
+		}
+		if (token.getType().equals(ExamplesLineToken)) {
+			stackHandler.push(Examples.class);
+			stackHandler.consume(token);
+			return 15;
+		}
+		if (token.getType().equals(CommentToken)) {
+			stackHandler.consume(token);
+			return 14;
+		}
+		if (token.getType().equals(EmptyToken)) {
+			stackHandler.consume(token);
+			return 14;
+		}
+		throw new IllegalStateException();
+	}
+
+	// Feature:5>__alt0:1>ScenarioOutline:4>ExamplesDefinition:1>Examples:0>#ExamplesLine:0
+	private int matchTokenAt_15(Token token) {
+		if (token.getType().equals(EOFToken)) {
+			stackHandler.collapse(Examples.class);
+			stackHandler.collapse(ExamplesDefinition.class);
+			stackHandler.collapse(ScenarioOutline.class);
+			stackHandler.consume(token);
+			return 17;
+		}
+		if (token.getType().equals(TableRowToken)) {
+			stackHandler.push(ExamplesTable.class);
+			stackHandler.consume(token);
+			return 16;
+		}
+		if (token.getType().equals(TagLineToken)) {
+			if (lookahead_2(token))
+			{
+			stackHandler.collapse(Examples.class);
+			stackHandler.collapse(ExamplesDefinition.class);
+			stackHandler.push(ExamplesDefinition.class);
+			stackHandler.consume(token);
+			return 14;
+			}
+		}
+		if (token.getType().equals(TagLineToken)) {
+			if (lookahead_0(token))
+			{
+			stackHandler.collapse(Examples.class);
+			stackHandler.collapse(ExamplesDefinition.class);
+			stackHandler.collapse(ScenarioOutline.class);
+			stackHandler.push(Scenario.class);
+			stackHandler.consume(token);
+			return 6;
+			}
+		}
+		if (token.getType().equals(TagLineToken)) {
+			if (lookahead_1(token))
+			{
+			stackHandler.collapse(Examples.class);
+			stackHandler.collapse(ExamplesDefinition.class);
+			stackHandler.collapse(ScenarioOutline.class);
+			stackHandler.push(ScenarioOutline.class);
+			stackHandler.consume(token);
+			return 10;
+			}
+		}
+		if (token.getType().equals(ExamplesLineToken)) {
+			stackHandler.collapse(Examples.class);
+			stackHandler.collapse(ExamplesDefinition.class);
+			stackHandler.push(ExamplesDefinition.class);
+			stackHandler.push(Examples.class);
+			stackHandler.consume(token);
+			return 15;
+		}
+		if (token.getType().equals(ScenarioLineToken)) {
+			stackHandler.collapse(Examples.class);
+			stackHandler.collapse(ExamplesDefinition.class);
+			stackHandler.collapse(ScenarioOutline.class);
+			stackHandler.push(Scenario.class);
+			stackHandler.consume(token);
+			return 7;
+		}
+		if (token.getType().equals(ScenarioOutlineLineToken)) {
+			stackHandler.collapse(Examples.class);
+			stackHandler.collapse(ExamplesDefinition.class);
+			stackHandler.collapse(ScenarioOutline.class);
+			stackHandler.push(ScenarioOutline.class);
+			stackHandler.consume(token);
+			return 11;
+		}
+		if (token.getType().equals(OtherToken)) {
+			stackHandler.consume(token);
+			return 15;
+		}
+		throw new IllegalStateException();
+	}
+
+	// Feature:5>__alt0:1>ScenarioOutline:4>ExamplesDefinition:1>Examples:2>ExamplesTable:0>#TableRow:0
+	private int matchTokenAt_16(Token token) {
+		if (token.getType().equals(EOFToken)) {
+			stackHandler.collapse(ExamplesTable.class);
+			stackHandler.collapse(Examples.class);
+			stackHandler.collapse(ExamplesDefinition.class);
+			stackHandler.collapse(ScenarioOutline.class);
+			stackHandler.consume(token);
+			return 17;
+		}
+		if (token.getType().equals(TableRowToken)) {
+			stackHandler.consume(token);
+			return 16;
+		}
+		if (token.getType().equals(TagLineToken)) {
+			if (lookahead_2(token))
+			{
+			stackHandler.collapse(ExamplesTable.class);
+			stackHandler.collapse(Examples.class);
+			stackHandler.collapse(ExamplesDefinition.class);
+			stackHandler.push(ExamplesDefinition.class);
+			stackHandler.consume(token);
+			return 14;
+			}
+		}
+		if (token.getType().equals(TagLineToken)) {
+			if (lookahead_0(token))
+			{
+			stackHandler.collapse(ExamplesTable.class);
+			stackHandler.collapse(Examples.class);
+			stackHandler.collapse(ExamplesDefinition.class);
+			stackHandler.collapse(ScenarioOutline.class);
+			stackHandler.push(Scenario.class);
+			stackHandler.consume(token);
+			return 6;
+			}
+		}
+		if (token.getType().equals(TagLineToken)) {
+			if (lookahead_1(token))
+			{
+			stackHandler.collapse(ExamplesTable.class);
+			stackHandler.collapse(Examples.class);
+			stackHandler.collapse(ExamplesDefinition.class);
+			stackHandler.collapse(ScenarioOutline.class);
+			stackHandler.push(ScenarioOutline.class);
+			stackHandler.consume(token);
+			return 10;
+			}
+		}
+		if (token.getType().equals(ExamplesLineToken)) {
+			stackHandler.collapse(ExamplesTable.class);
+			stackHandler.collapse(Examples.class);
+			stackHandler.collapse(ExamplesDefinition.class);
+			stackHandler.push(ExamplesDefinition.class);
+			stackHandler.push(Examples.class);
+			stackHandler.consume(token);
+			return 15;
+		}
+		if (token.getType().equals(ScenarioLineToken)) {
+			stackHandler.collapse(ExamplesTable.class);
+			stackHandler.collapse(Examples.class);
+			stackHandler.collapse(ExamplesDefinition.class);
+			stackHandler.collapse(ScenarioOutline.class);
+			stackHandler.push(Scenario.class);
+			stackHandler.consume(token);
+			return 7;
+		}
+		if (token.getType().equals(ScenarioOutlineLineToken)) {
+			stackHandler.collapse(ExamplesTable.class);
+			stackHandler.collapse(Examples.class);
+			stackHandler.collapse(ExamplesDefinition.class);
+			stackHandler.collapse(ScenarioOutline.class);
+			stackHandler.push(ScenarioOutline.class);
+			stackHandler.consume(token);
+			return 11;
+		}
+		if (token.getType().equals(CommentToken)) {
+			stackHandler.consume(token);
+			return 16;
+		}
+		if (token.getType().equals(EmptyToken)) {
+			stackHandler.consume(token);
+			return 16;
+		}
+		throw new IllegalStateException();
+	}
+
+	// Feature:5>__alt0:1>ScenarioOutline:3>Step:1>__alt1:1>DocString:0>#DocStringSeparator:0
+	private int matchTokenAt_18(Token token) {
+		if (token.getType().equals(DocStringSeparatorToken)) {
+			stackHandler.consume(token);
+			return 19;
+		}
+		if (token.getType().equals(OtherToken)) {
+			stackHandler.consume(token);
 			return 18;
 		}
 		throw new IllegalStateException();
 	}
 
-	// GherkinDocument:0>Feature:5>ScenarioDefinition:1>__alt0:0>Scenario:2>Step:1>__alt1:1>DocString:0>#DocStringSeparator:0
+	// Feature:5>__alt0:1>ScenarioOutline:3>Step:1>__alt1:1>DocString:2>#DocStringSeparator:0
 	private int matchTokenAt_19(Token token) {
-		if (token.getType().equals(DocStringSeparatorToken)) {
-			STACK.get().consume(token);
-			return 20;
+		if (token.getType().equals(EOFToken)) {
+			stackHandler.collapse(DocString.class);
+			stackHandler.collapse(Step.class);
+			stackHandler.collapse(ScenarioOutline.class);
+			stackHandler.consume(token);
+			return 17;
 		}
-		if (token.getType().equals(OtherToken)) {
-			STACK.get().consume(token);
+		if (token.getType().equals(StepLineToken)) {
+			stackHandler.collapse(DocString.class);
+			stackHandler.collapse(Step.class);
+			stackHandler.push(Step.class);
+			stackHandler.consume(token);
+			return 12;
+		}
+		if (token.getType().equals(TagLineToken)) {
+			if (lookahead_2(token))
+			{
+			stackHandler.collapse(DocString.class);
+			stackHandler.collapse(Step.class);
+			stackHandler.push(ExamplesDefinition.class);
+			stackHandler.consume(token);
+			return 14;
+			}
+		}
+		if (token.getType().equals(TagLineToken)) {
+			if (lookahead_0(token))
+			{
+			stackHandler.collapse(DocString.class);
+			stackHandler.collapse(Step.class);
+			stackHandler.collapse(ScenarioOutline.class);
+			stackHandler.push(Scenario.class);
+			stackHandler.consume(token);
+			return 6;
+			}
+		}
+		if (token.getType().equals(TagLineToken)) {
+			if (lookahead_1(token))
+			{
+			stackHandler.collapse(DocString.class);
+			stackHandler.collapse(Step.class);
+			stackHandler.collapse(ScenarioOutline.class);
+			stackHandler.push(ScenarioOutline.class);
+			stackHandler.consume(token);
+			return 10;
+			}
+		}
+		if (token.getType().equals(ExamplesLineToken)) {
+			stackHandler.collapse(DocString.class);
+			stackHandler.collapse(Step.class);
+			stackHandler.push(ExamplesDefinition.class);
+			stackHandler.push(Examples.class);
+			stackHandler.consume(token);
+			return 15;
+		}
+		if (token.getType().equals(ScenarioLineToken)) {
+			stackHandler.collapse(DocString.class);
+			stackHandler.collapse(Step.class);
+			stackHandler.collapse(ScenarioOutline.class);
+			stackHandler.push(Scenario.class);
+			stackHandler.consume(token);
+			return 7;
+		}
+		if (token.getType().equals(ScenarioOutlineLineToken)) {
+			stackHandler.collapse(DocString.class);
+			stackHandler.collapse(Step.class);
+			stackHandler.collapse(ScenarioOutline.class);
+			stackHandler.push(ScenarioOutline.class);
+			stackHandler.consume(token);
+			return 11;
+		}
+		if (token.getType().equals(CommentToken)) {
+			stackHandler.consume(token);
+			return 19;
+		}
+		if (token.getType().equals(EmptyToken)) {
+			stackHandler.consume(token);
 			return 19;
 		}
 		throw new IllegalStateException();
 	}
 
-	// GherkinDocument:0>Feature:5>ScenarioDefinition:1>__alt0:0>Scenario:2>Step:1>__alt1:1>DocString:2>#DocStringSeparator:0
+	// Feature:5>__alt0:0>Scenario:3>Step:1>__alt1:1>DocString:0>#DocStringSeparator:0
 	private int matchTokenAt_20(Token token) {
-		if (token.getType().equals(EOFToken)) {
-			STACK.get().collapse(DocString.class);
-			STACK.get().collapse(Step.class);
-			STACK.get().collapse(Scenario.class);
-			STACK.get().collapse(ScenarioDefinition.class);
-			STACK.get().collapse(Feature.class);
-			STACK.get().consume(token);
-			return 16;
+		if (token.getType().equals(DocStringSeparatorToken)) {
+			stackHandler.consume(token);
+			return 21;
 		}
-		if (token.getType().equals(StepLineToken)) {
-			STACK.get().collapse(DocString.class);
-			STACK.get().collapse(Step.class);
-			STACK.get().push(Step.class);
-			STACK.get().consume(token);
-			return 8;
-		}
-		if (token.getType().equals(TagLineToken)) {
-			STACK.get().collapse(DocString.class);
-			STACK.get().collapse(Step.class);
-			STACK.get().collapse(Scenario.class);
-			STACK.get().collapse(ScenarioDefinition.class);
-			STACK.get().push(ScenarioDefinition.class);
-			STACK.get().consume(token);
-			return 6;
-		}
-		if (token.getType().equals(ScenarioLineToken)) {
-			STACK.get().collapse(DocString.class);
-			STACK.get().collapse(Step.class);
-			STACK.get().collapse(Scenario.class);
-			STACK.get().collapse(ScenarioDefinition.class);
-			STACK.get().push(ScenarioDefinition.class);
-			STACK.get().push(Scenario.class);
-			STACK.get().consume(token);
-			return 7;
-		}
-		if (token.getType().equals(ScenarioOutlineLineToken)) {
-			STACK.get().collapse(DocString.class);
-			STACK.get().collapse(Step.class);
-			STACK.get().collapse(Scenario.class);
-			STACK.get().collapse(ScenarioDefinition.class);
-			STACK.get().push(ScenarioDefinition.class);
-			STACK.get().push(ScenarioOutline.class);
-			STACK.get().consume(token);
-			return 10;
-		}
-		if (token.getType().equals(CommentToken)) {
-			STACK.get().consume(token);
-			return 20;
-		}
-		if (token.getType().equals(EmptyToken)) {
-			STACK.get().consume(token);
+		if (token.getType().equals(OtherToken)) {
+			stackHandler.consume(token);
 			return 20;
 		}
 		throw new IllegalStateException();
 	}
 
-	// GherkinDocument:0>Feature:4>Background:2>Step:1>__alt1:1>DocString:0>#DocStringSeparator:0
+	// Feature:5>__alt0:0>Scenario:3>Step:1>__alt1:1>DocString:2>#DocStringSeparator:0
 	private int matchTokenAt_21(Token token) {
-		if (token.getType().equals(DocStringSeparatorToken)) {
-			STACK.get().consume(token);
-			return 22;
+		if (token.getType().equals(EOFToken)) {
+			stackHandler.collapse(DocString.class);
+			stackHandler.collapse(Step.class);
+			stackHandler.collapse(Scenario.class);
+			stackHandler.consume(token);
+			return 17;
 		}
-		if (token.getType().equals(OtherToken)) {
-			STACK.get().consume(token);
+		if (token.getType().equals(StepLineToken)) {
+			stackHandler.collapse(DocString.class);
+			stackHandler.collapse(Step.class);
+			stackHandler.push(Step.class);
+			stackHandler.consume(token);
+			return 8;
+		}
+		if (token.getType().equals(TagLineToken)) {
+			if (lookahead_0(token))
+			{
+			stackHandler.collapse(DocString.class);
+			stackHandler.collapse(Step.class);
+			stackHandler.collapse(Scenario.class);
+			stackHandler.push(Scenario.class);
+			stackHandler.consume(token);
+			return 6;
+			}
+		}
+		if (token.getType().equals(TagLineToken)) {
+			if (lookahead_1(token))
+			{
+			stackHandler.collapse(DocString.class);
+			stackHandler.collapse(Step.class);
+			stackHandler.collapse(Scenario.class);
+			stackHandler.push(ScenarioOutline.class);
+			stackHandler.consume(token);
+			return 10;
+			}
+		}
+		if (token.getType().equals(ScenarioLineToken)) {
+			stackHandler.collapse(DocString.class);
+			stackHandler.collapse(Step.class);
+			stackHandler.collapse(Scenario.class);
+			stackHandler.push(Scenario.class);
+			stackHandler.consume(token);
+			return 7;
+		}
+		if (token.getType().equals(ScenarioOutlineLineToken)) {
+			stackHandler.collapse(DocString.class);
+			stackHandler.collapse(Step.class);
+			stackHandler.collapse(Scenario.class);
+			stackHandler.push(ScenarioOutline.class);
+			stackHandler.consume(token);
+			return 11;
+		}
+		if (token.getType().equals(CommentToken)) {
+			stackHandler.consume(token);
+			return 21;
+		}
+		if (token.getType().equals(EmptyToken)) {
+			stackHandler.consume(token);
 			return 21;
 		}
 		throw new IllegalStateException();
 	}
 
-	// GherkinDocument:0>Feature:4>Background:2>Step:1>__alt1:1>DocString:2>#DocStringSeparator:0
+	// Feature:4>Background:2>Step:1>__alt1:1>DocString:0>#DocStringSeparator:0
 	private int matchTokenAt_22(Token token) {
+		if (token.getType().equals(DocStringSeparatorToken)) {
+			stackHandler.consume(token);
+			return 23;
+		}
+		if (token.getType().equals(OtherToken)) {
+			stackHandler.consume(token);
+			return 22;
+		}
+		throw new IllegalStateException();
+	}
+
+	// Feature:4>Background:2>Step:1>__alt1:1>DocString:2>#DocStringSeparator:0
+	private int matchTokenAt_23(Token token) {
 		if (token.getType().equals(EOFToken)) {
-			STACK.get().collapse(DocString.class);
-			STACK.get().collapse(Step.class);
-			STACK.get().collapse(Background.class);
-			STACK.get().collapse(Feature.class);
-			STACK.get().consume(token);
-			return 16;
+			stackHandler.collapse(DocString.class);
+			stackHandler.collapse(Step.class);
+			stackHandler.collapse(Background.class);
+			stackHandler.consume(token);
+			return 17;
 		}
 		if (token.getType().equals(StepLineToken)) {
-			STACK.get().collapse(DocString.class);
-			STACK.get().collapse(Step.class);
-			STACK.get().push(Step.class);
-			STACK.get().consume(token);
+			stackHandler.collapse(DocString.class);
+			stackHandler.collapse(Step.class);
+			stackHandler.push(Step.class);
+			stackHandler.consume(token);
 			return 4;
 		}
 		if (token.getType().equals(TagLineToken)) {
-			STACK.get().collapse(DocString.class);
-			STACK.get().collapse(Step.class);
-			STACK.get().collapse(Background.class);
-			STACK.get().push(ScenarioDefinition.class);
-			STACK.get().consume(token);
+			if (lookahead_0(token))
+			{
+			stackHandler.collapse(DocString.class);
+			stackHandler.collapse(Step.class);
+			stackHandler.collapse(Background.class);
+			stackHandler.push(Scenario.class);
+			stackHandler.consume(token);
 			return 6;
+			}
+		}
+		if (token.getType().equals(TagLineToken)) {
+			if (lookahead_1(token))
+			{
+			stackHandler.collapse(DocString.class);
+			stackHandler.collapse(Step.class);
+			stackHandler.collapse(Background.class);
+			stackHandler.push(ScenarioOutline.class);
+			stackHandler.consume(token);
+			return 10;
+			}
 		}
 		if (token.getType().equals(ScenarioLineToken)) {
-			STACK.get().collapse(DocString.class);
-			STACK.get().collapse(Step.class);
-			STACK.get().collapse(Background.class);
-			STACK.get().push(ScenarioDefinition.class);
-			STACK.get().push(Scenario.class);
-			STACK.get().consume(token);
+			stackHandler.collapse(DocString.class);
+			stackHandler.collapse(Step.class);
+			stackHandler.collapse(Background.class);
+			stackHandler.push(Scenario.class);
+			stackHandler.consume(token);
 			return 7;
 		}
 		if (token.getType().equals(ScenarioOutlineLineToken)) {
-			STACK.get().collapse(DocString.class);
-			STACK.get().collapse(Step.class);
-			STACK.get().collapse(Background.class);
-			STACK.get().push(ScenarioDefinition.class);
-			STACK.get().push(ScenarioOutline.class);
-			STACK.get().consume(token);
-			return 10;
+			stackHandler.collapse(DocString.class);
+			stackHandler.collapse(Step.class);
+			stackHandler.collapse(Background.class);
+			stackHandler.push(ScenarioOutline.class);
+			stackHandler.consume(token);
+			return 11;
 		}
 		if (token.getType().equals(CommentToken)) {
-			STACK.get().consume(token);
-			return 22;
+			stackHandler.consume(token);
+			return 23;
 		}
 		if (token.getType().equals(EmptyToken)) {
-			STACK.get().consume(token);
-			return 22;
+			stackHandler.consume(token);
+			return 23;
 		}
 		throw new IllegalStateException();
 	}
@@ -1198,7 +1320,57 @@ public class Parser {
 		boolean match = false;
 		do
 		{
-			token = QUEUE.get().next();
+			token = queue.next();
+			newQueue.add(token);
+
+			if (false
+				|| token.getType().equals(ScenarioLineToken)
+			)
+			{
+				match = true;
+				break;
+			}
+		} while (false
+			|| token.getType().equals(EmptyToken)
+			|| token.getType().equals(CommentToken)
+			|| token.getType().equals(TagLineToken)
+		);
+		queue.add(newQueue);
+		return match;
+	}
+
+	private boolean lookahead_1(Token currentToken) {
+		Token token;
+		Queue<Token> newQueue = new ArrayDeque<Token>();
+		boolean match = false;
+		do
+		{
+			token = queue.next();
+			newQueue.add(token);
+
+			if (false
+				|| token.getType().equals(ScenarioOutlineLineToken)
+			)
+			{
+				match = true;
+				break;
+			}
+		} while (false
+			|| token.getType().equals(EmptyToken)
+			|| token.getType().equals(CommentToken)
+			|| token.getType().equals(TagLineToken)
+		);
+		queue.add(newQueue);
+		return match;
+	}
+
+	private boolean lookahead_2(Token currentToken) {
+		Token token;
+		Queue<Token> newQueue = new ArrayDeque<Token>();
+		boolean match = false;
+		do
+		{
+			token = queue.next();
 			newQueue.add(token);
 
 			if (false
@@ -1213,7 +1385,7 @@ public class Parser {
 			|| token.getType().equals(CommentToken)
 			|| token.getType().equals(TagLineToken)
 		);
-		QUEUE.get().add(newQueue);
+		queue.add(newQueue);
 		return match;
 	}
 }

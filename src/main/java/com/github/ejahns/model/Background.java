@@ -7,6 +7,7 @@ import com.github.ejahns.Token;
 
 public class Background implements GherkinElement {
 
+	private int lineNum;
 	private String backgroundName;
 	private List<String> description = new ArrayList<>();
 	private List<Step> steps = new ArrayList<>();
@@ -24,6 +25,7 @@ public class Background implements GherkinElement {
 	public boolean consume(Token t) {
 		switch (t.getType()){
 			case BackgroundLineToken:
+				this.lineNum = t.getLineNum();
 				backgroundName = t.getLine();
 				return true;
 			case OtherToken:

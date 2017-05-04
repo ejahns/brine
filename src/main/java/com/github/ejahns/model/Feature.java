@@ -7,18 +7,20 @@ import com.github.ejahns.Token;
 
 public class Feature implements GherkinElement {
 
+	private int lineNum;
 	private List<String> tags = new ArrayList<>();
 	private String featureName;
 	private List<String> description = new ArrayList<>();
 	private Background background;
-	private List<ScenarioDefinition> definitions = new ArrayList<>();
+	private List<AbstractScenario> scenarios = new ArrayList<>();
 
 	@Override
 	public boolean add(GherkinElement t) {
-		if (t instanceof ScenarioDefinition) {
-			definitions.add((ScenarioDefinition) t);
+		if (t instanceof AbstractScenario) {
+			scenarios.add((AbstractScenario) t);
 			return true;
-		} else if (t instanceof Background) {
+		}
+		else if (t instanceof Background) {
 			background = (Background) t;
 			return true;
 		}
@@ -35,9 +37,11 @@ public class Feature implements GherkinElement {
 				tags.add(t.getLine());
 				return true;
 			case FeatureLineToken:
+				lineNum = t.getLineNum();
 				featureName = t.getLine();
 				return true;
-
+			case EOFToken:
+				return true;
 		}
 		return false;
 	}

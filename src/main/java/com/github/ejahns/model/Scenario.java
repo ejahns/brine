@@ -5,8 +5,9 @@ import java.util.List;
 
 import com.github.ejahns.Token;
 
-public class Scenario implements GherkinElement {
+public class Scenario extends AbstractScenario{
 
+	private int lineNum;
 	private String scenarioName;
 	private List<String> description = new ArrayList<>();
 	private List<Step> steps = new ArrayList<>();
@@ -24,6 +25,7 @@ public class Scenario implements GherkinElement {
 	public boolean consume(Token t) {
 		switch (t.getType()) {
 			case ScenarioLineToken:
+				this.lineNum = t.getLineNum();
 				this.scenarioName = t.getLine();
 				return true;
 			case OtherToken:

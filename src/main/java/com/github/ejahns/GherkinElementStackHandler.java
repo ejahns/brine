@@ -3,13 +3,13 @@ package com.github.ejahns;
 import java.util.ArrayDeque;
 import java.util.Deque;
 
-import com.github.ejahns.model.GherkinDocument;
+import com.github.ejahns.model.Feature;
 import com.github.ejahns.model.GherkinElement;
 
-public class GherkinElementStack {
+public class GherkinElementStackHandler {
 
 	private Deque<GherkinElement> stack = new ArrayDeque<>();
-	private GherkinDocument result = null;
+	private Feature result = null;
 
 	public void push(Class<? extends GherkinElement> clazz) {
 		try {
@@ -26,14 +26,14 @@ public class GherkinElementStack {
 			stack.peek().add(pop);
 		}
 		else {
-			if (!(pop instanceof GherkinDocument)) {
+			if (!(pop instanceof Feature)) {
 				throw new IllegalStateException();
 			}
-			result = (GherkinDocument) pop;
+			result = (Feature) pop;
 		}
 	}
 
-	public GherkinDocument resolve() {
+	public Feature resolve() {
 		return result;
 	}
 

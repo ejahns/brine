@@ -1,57 +1,66 @@
 {
-	"feature": {
-		"tags": [
-			"@This is a tag",
-			"@This is another tag",
-			"@Function(\"This tag has an argument\")"
-		],
-		"featureName": "Feature: some feature",
-		"description": [
-			"Here is some description",
-			"Here is more description"
-		],
-		"background": {
-			"backgroundName": "Background:",
-			"description": [],
+	"lineNum": 3,
+	"tags": [
+		"@Some Tag",
+		"@Meta(\"Some tag with an argument\")"
+	],
+	"featureName": "Some Feature",
+	"description": [
+		"Some description."
+	],
+	"background": {
+		"lineNum": 6,
+		"backgroundName": "",
+		"description": [],
+		"steps": [
+			{
+				"lineNum": 7,
+				"keyword": "Given",
+				"step": "some common condition"
+			},
+			{
+				"lineNum": 8,
+				"keyword": "And",
+				"step": "something else"
+			}
+		]
+	},
+	"scenarios": [
+		{
+			"lineNum": 10,
+			"scenarioName": "Some Scenario",
+			"description": [
+				"Some scenario description."
+			],
 			"steps": [
 				{
-					"step": "Given some common condition"
+					"lineNum": 13,
+					"keyword": "When",
+					"step": "I do something"
+				},
+				{
+					"lineNum": 14,
+					"keyword": "Then",
+					"step": "there is some result"
 				}
 			]
 		},
-		"definitions": [
-			{
-				"tags": [],
-				"scenario": {
-					"scenarioName": "Scenario: some scenario",
-					"description": [],
-					"steps": [
-						{
-							"step": "When something happens"
-						},
-						{
-							"step": "Then there is some result"
-						}
-					]
+		{
+			"lineNum": 16,
+			"scenarioName": "Some other scenario",
+			"description": [],
+			"steps": [
+				{
+					"lineNum": 18,
+					"keyword": "When",
+					"step": "I do something else"
+				},
+				{
+					"lineNum": 19,
+					"keyword": "Then",
+					"step": "something else happens"
 				}
-			},
-			{
-				"tags": [],
-				"scenario": {
-					"scenarioName": "Scenario: some other scenario",
-					"description": [
-						"This one needs a description"
-					],
-					"steps": [
-						{
-							"step": "When something else happens"
-						},
-						{
-							"step": "Then there is some other result"
-						}
-					]
-				}
-			}
-		]
-	}
+			]
+		}
+	]
 }

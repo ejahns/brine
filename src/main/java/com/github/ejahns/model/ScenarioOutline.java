@@ -2,10 +2,7 @@ package com.github.ejahns.model;
 
 import com.github.ejahns.Token;
 
-/**
- * Created by ejahns on 5/3/2017.
- */
-public class ScenarioOutline implements GherkinElement {
+public class ScenarioOutline extends AbstractScenario {
 
 	@Override
 	public boolean add(GherkinElement t) {
