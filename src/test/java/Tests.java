@@ -17,7 +17,7 @@ public class Tests {
 	@Test
 	public void fileFeature() throws IOException {
 		File file = new File("src/test/resources/sample_feature.feature");
-		Feature ferment = PickleJar.ferment(file);
+		Feature ferment = PickleJar.cure(file);
 		JsonReader reader = new JsonReader(new FileReader("src/test/resources/sample_feature.json"));
 		Gson gson = new Gson();
 		JsonParser jsonParser = new JsonParser();
