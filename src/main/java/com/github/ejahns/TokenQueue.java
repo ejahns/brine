@@ -78,6 +78,12 @@ public class TokenQueue {
 		if (trimmed.startsWith("@")) {
 			return new Token(trimmed, TagLineToken, i);
 		}
+		if (trimmed.startsWith("|")) {
+			if (!trimmed.endsWith("|")) {
+				throw new TokenizerException("expected final '|' at end of line: " + trimmed);
+			}
+			return new Token(trimmed, TableRowToken, i);
+		}
 		for (String key : lineKeys.keySet()) {
 			if (trimmed.startsWith(key)) {
 				trimmed = trimmed.replaceFirst(key, "").trim();

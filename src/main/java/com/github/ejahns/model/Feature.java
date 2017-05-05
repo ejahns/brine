@@ -1,6 +1,5 @@
 package com.github.ejahns.model;
 
-import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -8,7 +7,7 @@ import com.github.ejahns.Token;
 
 public class Feature implements GherkinElement {
 
-	private URI uri;
+	private String location;
 	private int lineNum;
 	private List<String> tags = new ArrayList<>();
 	private String featureName;
@@ -16,13 +15,13 @@ public class Feature implements GherkinElement {
 	private Background background;
 	private List<AbstractScenario> scenarios = new ArrayList<>();
 
-	public URI getUri() {
-		return uri;
+	public String getLocation() {
+		return location;
 	}
 
 	//TODO don't expose this method
-	public void setUri(URI uri) {
-		this.uri = uri;
+	public void setLocation(String location) {
+		this.location = location;
 	}
 
 	public int getLineNum() {

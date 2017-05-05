@@ -1,5 +1,5 @@
 {
-	"uri": "file:/C:/experiment/brine/src/test/resources/sample_feature.feature",
+	"location": "src/test/resources/sample_feature.feature",
 	"lineNum": 3,
 	"tags": [
 		"@Some Tag",

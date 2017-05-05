@@ -7,9 +7,14 @@ public class Step implements GherkinElement {
 	private int lineNum;
 	private String keyword;
 	private String step;
+	private DataTable dataTable;
 
 	@Override
 	public boolean add(GherkinElement t) {
+		if (t instanceof DataTable) {
+			this.dataTable = (DataTable) t;
+			return true;
+		}
 		return false;
 	}
 

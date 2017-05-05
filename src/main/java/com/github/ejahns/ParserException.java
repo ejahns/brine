@@ -10,7 +10,34 @@ public class ParserException extends RuntimeException {
 		super(message);
 	}
 
+	public static class UnexpectedTableRowException extends ParserException {
+
+		private String token;
+		private int expectedCount;
+		private int actualCount;
+		private int lineNum;
+
+		public UnexpectedTableRowException(String token, int expectedCount, int actualCount, int lineNum) {
+			super(getMessage(token, expectedCount, actualCount, lineNum));
+			this.token = token;
+			this.expectedCount = expectedCount;
+			this.actualCount = actualCount;
+			this.lineNum = lineNum;
+		}
+
+		private static String getMessage(String token, int expectedCount, int actualCount, int lineNum) {
+			return
+				String.format("Expected row with %s cells but got %s cells at line %s: %s",
+					expectedCount,
+					actualCount,
+					lineNum,
+					token
+				);
+		}
+	}
+
 	public static class UnexpectedTokenException extends ParserException {
+
 		private String token;
 		private List<String> expectedTypes;
 		private int lineNum;

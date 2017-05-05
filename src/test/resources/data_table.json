@@ -1,0 +1,40 @@
+{
+	"location": "src/test/resources/data_table.feature",
+	"lineNum": 1,
+	"tags": [],
+	"featureName": "Some Feature",
+	"description": [],
+	"scenarios": [
+		{
+			"lineNum": 3,
+			"scenarioName": "Some Scenario",
+			"description": [],
+			"steps": [
+				{
+					"lineNum": 4,
+					"keyword": "Given",
+					"step": "some step with a tic-tac-toe board:",
+					"dataTable": {
+						"dataTable": [
+							[
+								"",
+								"x",
+								"o"
+							],
+							[
+								"o",
+								"",
+								"x"
+							],
+							[
+								"x",
+								"",
+								""
+							]
+						]
+					}
+				}
+			]
+		}
+	]
+}
