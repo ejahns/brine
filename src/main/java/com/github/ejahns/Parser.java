@@ -4,21 +4,21 @@
 //	  the code is regenerated.
 package com.github.ejahns;
 
-import java.util.ArrayDeque;
 import java.util.List;
+import java.util.ArrayDeque;
 import java.util.Queue;
 
-import com.github.ejahns.ParserException.UnexpectedTokenException;
-import com.github.ejahns.model.Background;
-import com.github.ejahns.model.DataTable;
-import com.github.ejahns.model.DocString;
-import com.github.ejahns.model.Examples;
-import com.github.ejahns.model.ExamplesDefinition;
-import com.github.ejahns.model.ExamplesTable;
+import com.github.ejahns.ParserException.*;
 import com.github.ejahns.model.Feature;
+import com.github.ejahns.model.Background;
 import com.github.ejahns.model.Scenario;
 import com.github.ejahns.model.ScenarioOutline;
+import com.github.ejahns.model.ExamplesDefinition;
+import com.github.ejahns.model.Examples;
+import com.github.ejahns.model.ExamplesTable;
 import com.github.ejahns.model.Step;
+import com.github.ejahns.model.DataTable;
+import com.github.ejahns.model.DocString;
 
 import static com.github.ejahns.Parser.TokenType.*;
 import static java.util.Arrays.*;
@@ -119,8 +119,8 @@ public class Parser {
 			case 16:
 				newState = matchTokenAt_16(token);
 				break;
-			case 18:
-				newState = matchTokenAt_18(token);
+			case 17:
+				newState = matchTokenAt_17(token);
 				break;
 			case 19:
 				newState = matchTokenAt_19(token);
@@ -136,6 +136,9 @@ public class Parser {
 				break;
 			case 23:
 				newState = matchTokenAt_23(token);
+				break;
+			case 24:
+				newState = matchTokenAt_24(token);
 				break;
 			default:
 				throw new IllegalStateException("Unknown state: " + state);
@@ -197,7 +200,7 @@ public class Parser {
 	private int matchTokenAt_2(Token token) {
 		if (token.getType().equals(EOFToken)) {
 			stackHandler.consume(token);
-			return 17;
+			return 18;
 		}
 		if (token.getType().equals(BackgroundLineToken)) {
 			stackHandler.push(Background.class);
@@ -244,7 +247,7 @@ public class Parser {
 		if (token.getType().equals(EOFToken)) {
 			stackHandler.collapse(Background.class);
 			stackHandler.consume(token);
-			return 17;
+			return 18;
 		}
 		if (token.getType().equals(StepLineToken)) {
 			stackHandler.push(Step.class);
@@ -296,7 +299,7 @@ public class Parser {
 			stackHandler.collapse(Step.class);
 			stackHandler.collapse(Background.class);
 			stackHandler.consume(token);
-			return 17;
+			return 18;
 		}
 		if (token.getType().equals(TableRowToken)) {
 			stackHandler.push(DataTable.class);
@@ -306,7 +309,7 @@ public class Parser {
 		if (token.getType().equals(DocStringSeparatorToken)) {
 			stackHandler.push(DocString.class);
 			stackHandler.consume(token);
-			return 22;
+			return 23;
 		}
 		if (token.getType().equals(StepLineToken)) {
 			stackHandler.collapse(Step.class);
@@ -368,7 +371,7 @@ public class Parser {
 			stackHandler.collapse(Step.class);
 			stackHandler.collapse(Background.class);
 			stackHandler.consume(token);
-			return 17;
+			return 18;
 		}
 		if (token.getType().equals(TableRowToken)) {
 			stackHandler.consume(token);
@@ -460,7 +463,7 @@ public class Parser {
 		if (token.getType().equals(EOFToken)) {
 			stackHandler.collapse(Scenario.class);
 			stackHandler.consume(token);
-			return 17;
+			return 18;
 		}
 		if (token.getType().equals(StepLineToken)) {
 			stackHandler.push(Step.class);
@@ -512,7 +515,7 @@ public class Parser {
 			stackHandler.collapse(Step.class);
 			stackHandler.collapse(Scenario.class);
 			stackHandler.consume(token);
-			return 17;
+			return 18;
 		}
 		if (token.getType().equals(TableRowToken)) {
 			stackHandler.push(DataTable.class);
@@ -522,7 +525,7 @@ public class Parser {
 		if (token.getType().equals(DocStringSeparatorToken)) {
 			stackHandler.push(DocString.class);
 			stackHandler.consume(token);
-			return 20;
+			return 21;
 		}
 		if (token.getType().equals(StepLineToken)) {
 			stackHandler.collapse(Step.class);
@@ -584,7 +587,7 @@ public class Parser {
 			stackHandler.collapse(Step.class);
 			stackHandler.collapse(Scenario.class);
 			stackHandler.consume(token);
-			return 17;
+			return 18;
 		}
 		if (token.getType().equals(TableRowToken)) {
 			stackHandler.consume(token);
@@ -676,7 +679,7 @@ public class Parser {
 		if (token.getType().equals(EOFToken)) {
 			stackHandler.collapse(ScenarioOutline.class);
 			stackHandler.consume(token);
-			return 17;
+			return 18;
 		}
 		if (token.getType().equals(StepLineToken)) {
 			stackHandler.push(Step.class);
@@ -742,7 +745,7 @@ public class Parser {
 			stackHandler.collapse(Step.class);
 			stackHandler.collapse(ScenarioOutline.class);
 			stackHandler.consume(token);
-			return 17;
+			return 18;
 		}
 		if (token.getType().equals(TableRowToken)) {
 			stackHandler.push(DataTable.class);
@@ -752,7 +755,7 @@ public class Parser {
 		if (token.getType().equals(DocStringSeparatorToken)) {
 			stackHandler.push(DocString.class);
 			stackHandler.consume(token);
-			return 18;
+			return 19;
 		}
 		if (token.getType().equals(StepLineToken)) {
 			stackHandler.collapse(Step.class);
@@ -830,7 +833,7 @@ public class Parser {
 			stackHandler.collapse(Step.class);
 			stackHandler.collapse(ScenarioOutline.class);
 			stackHandler.consume(token);
-			return 17;
+			return 18;
 		}
 		if (token.getType().equals(TableRowToken)) {
 			stackHandler.consume(token);
@@ -943,7 +946,7 @@ public class Parser {
 			stackHandler.collapse(ExamplesDefinition.class);
 			stackHandler.collapse(ScenarioOutline.class);
 			stackHandler.consume(token);
-			return 17;
+			return 18;
 		}
 		if (token.getType().equals(TableRowToken)) {
 			stackHandler.push(ExamplesTable.class);
@@ -1017,17 +1020,36 @@ public class Parser {
 
 	// Feature:5>__alt0:1>ScenarioOutline:4>ExamplesDefinition:1>Examples:2>ExamplesTable:0>#TableRow:0
 	private int matchTokenAt_16(Token token) {
+		if (token.getType().equals(TableRowToken)) {
+			stackHandler.consume(token);
+			return 17;
+		}
+		if (token.getType().equals(CommentToken)) {
+			stackHandler.consume(token);
+			return 16;
+		}
+		if (token.getType().equals(EmptyToken)) {
+			stackHandler.consume(token);
+			return 16;
+		}
+		
+		List<String> expectedTokens = asList("TableRow", "Comment", "Empty");
+		throw new UnexpectedTokenException(token.toString(), expectedTokens, token.getLineNum());
+	}
+
+	// Feature:5>__alt0:1>ScenarioOutline:4>ExamplesDefinition:1>Examples:2>ExamplesTable:1>#TableRow:0
+	private int matchTokenAt_17(Token token) {
 		if (token.getType().equals(EOFToken)) {
 			stackHandler.collapse(ExamplesTable.class);
 			stackHandler.collapse(Examples.class);
 			stackHandler.collapse(ExamplesDefinition.class);
 			stackHandler.collapse(ScenarioOutline.class);
 			stackHandler.consume(token);
-			return 17;
+			return 18;
 		}
 		if (token.getType().equals(TableRowToken)) {
 			stackHandler.consume(token);
-			return 16;
+			return 17;
 		}
 		if (token.getType().equals(TagLineToken)) {
 			if (lookahead_2(token))
@@ -1093,11 +1115,11 @@ public class Parser {
 		}
 		if (token.getType().equals(CommentToken)) {
 			stackHandler.consume(token);
-			return 16;
+			return 17;
 		}
 		if (token.getType().equals(EmptyToken)) {
 			stackHandler.consume(token);
-			return 16;
+			return 17;
 		}
 		
 		List<String> expectedTokens = asList("EOF", "TableRow", "TagLine", "ExamplesLine", "ScenarioLine", "ScenarioOutlineLine", "Comment", "Empty");
@@ -1105,14 +1127,14 @@ public class Parser {
 	}
 
 	// Feature:5>__alt0:1>ScenarioOutline:3>Step:1>__alt1:1>DocString:0>#DocStringSeparator:0
-	private int matchTokenAt_18(Token token) {
+	private int matchTokenAt_19(Token token) {
 		if (token.getType().equals(DocStringSeparatorToken)) {
 			stackHandler.consume(token);
-			return 19;
+			return 20;
 		}
 		if (token.getType().equals(OtherToken)) {
 			stackHandler.consume(token);
-			return 18;
+			return 19;
 		}
 		
 		List<String> expectedTokens = asList("DocStringSeparator", "Other");
@@ -1120,13 +1142,13 @@ public class Parser {
 	}
 
 	// Feature:5>__alt0:1>ScenarioOutline:3>Step:1>__alt1:1>DocString:2>#DocStringSeparator:0
-	private int matchTokenAt_19(Token token) {
+	private int matchTokenAt_20(Token token) {
 		if (token.getType().equals(EOFToken)) {
 			stackHandler.collapse(DocString.class);
 			stackHandler.collapse(Step.class);
 			stackHandler.collapse(ScenarioOutline.class);
 			stackHandler.consume(token);
-			return 17;
+			return 18;
 		}
 		if (token.getType().equals(StepLineToken)) {
 			stackHandler.collapse(DocString.class);
@@ -1193,11 +1215,11 @@ public class Parser {
 		}
 		if (token.getType().equals(CommentToken)) {
 			stackHandler.consume(token);
-			return 19;
+			return 20;
 		}
 		if (token.getType().equals(EmptyToken)) {
 			stackHandler.consume(token);
-			return 19;
+			return 20;
 		}
 		
 		List<String> expectedTokens = asList("EOF", "StepLine", "TagLine", "ExamplesLine", "ScenarioLine", "ScenarioOutlineLine", "Comment", "Empty");
@@ -1205,14 +1227,14 @@ public class Parser {
 	}
 
 	// Feature:5>__alt0:0>Scenario:3>Step:1>__alt1:1>DocString:0>#DocStringSeparator:0
-	private int matchTokenAt_20(Token token) {
+	private int matchTokenAt_21(Token token) {
 		if (token.getType().equals(DocStringSeparatorToken)) {
 			stackHandler.consume(token);
-			return 21;
+			return 22;
 		}
 		if (token.getType().equals(OtherToken)) {
 			stackHandler.consume(token);
-			return 20;
+			return 21;
 		}
 		
 		List<String> expectedTokens = asList("DocStringSeparator", "Other");
@@ -1220,13 +1242,13 @@ public class Parser {
 	}
 
 	// Feature:5>__alt0:0>Scenario:3>Step:1>__alt1:1>DocString:2>#DocStringSeparator:0
-	private int matchTokenAt_21(Token token) {
+	private int matchTokenAt_22(Token token) {
 		if (token.getType().equals(EOFToken)) {
 			stackHandler.collapse(DocString.class);
 			stackHandler.collapse(Step.class);
 			stackHandler.collapse(Scenario.class);
 			stackHandler.consume(token);
-			return 17;
+			return 18;
 		}
 		if (token.getType().equals(StepLineToken)) {
 			stackHandler.collapse(DocString.class);
@@ -1275,11 +1297,11 @@ public class Parser {
 		}
 		if (token.getType().equals(CommentToken)) {
 			stackHandler.consume(token);
-			return 21;
+			return 22;
 		}
 		if (token.getType().equals(EmptyToken)) {
 			stackHandler.consume(token);
-			return 21;
+			return 22;
 		}
 		
 		List<String> expectedTokens = asList("EOF", "StepLine", "TagLine", "ScenarioLine", "ScenarioOutlineLine", "Comment", "Empty");
@@ -1287,14 +1309,14 @@ public class Parser {
 	}
 
 	// Feature:4>Background:2>Step:1>__alt1:1>DocString:0>#DocStringSeparator:0
-	private int matchTokenAt_22(Token token) {
+	private int matchTokenAt_23(Token token) {
 		if (token.getType().equals(DocStringSeparatorToken)) {
 			stackHandler.consume(token);
-			return 23;
+			return 24;
 		}
 		if (token.getType().equals(OtherToken)) {
 			stackHandler.consume(token);
-			return 22;
+			return 23;
 		}
 		
 		List<String> expectedTokens = asList("DocStringSeparator", "Other");
@@ -1302,13 +1324,13 @@ public class Parser {
 	}
 
 	// Feature:4>Background:2>Step:1>__alt1:1>DocString:2>#DocStringSeparator:0
-	private int matchTokenAt_23(Token token) {
+	private int matchTokenAt_24(Token token) {
 		if (token.getType().equals(EOFToken)) {
 			stackHandler.collapse(DocString.class);
 			stackHandler.collapse(Step.class);
 			stackHandler.collapse(Background.class);
 			stackHandler.consume(token);
-			return 17;
+			return 18;
 		}
 		if (token.getType().equals(StepLineToken)) {
 			stackHandler.collapse(DocString.class);
@@ -1357,11 +1379,11 @@ public class Parser {
 		}
 		if (token.getType().equals(CommentToken)) {
 			stackHandler.consume(token);
-			return 23;
+			return 24;
 		}
 		if (token.getType().equals(EmptyToken)) {
 			stackHandler.consume(token);
-			return 23;
+			return 24;
 		}
 		
 		List<String> expectedTokens = asList("EOF", "StepLine", "TagLine", "ScenarioLine", "ScenarioOutlineLine", "Comment", "Empty");
