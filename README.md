@@ -25,13 +25,13 @@ The `cureCollectErrors` methods accept a `List<String>` which is populated with 
 encountered by the tokenizer or parser. The methods return the `Feature` representing the
 Gherkin, ignoring any invalid lines.
 
-###Exception Types
+### Exception Types
 
-#####TokenizerException
+##### TokenizerException
 *thrown when a line is encountered that the tokenizer cannot interpret, 
 e.g. a examples/table line without a terminating `|`*
 
-#####ParserException
+##### ParserException
 *thrown when a line is encountered that was properly tokenized, 
 but violates the Gherkin grammar, e.g. a description line between two steps*
 
@@ -98,7 +98,7 @@ Invoking PickleJar.cure() produces a `Feature` with the below json representatio
 }
 ```
 
-##Acknowledgements
+## Acknowledgements
 brine is based heavily on the [cucumber/gherkin](https://github.com/cucumber/gherkin) implementation.
 Like that implementation, brine employs [berp](https://github.com/gasparnagy/berp), an extensible parser
 generator. 
