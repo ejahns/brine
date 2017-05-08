@@ -34,6 +34,9 @@ public class GherkinElementStackHandler {
 	}
 
 	public Feature resolve() {
+		while(null == result) {
+			collapse(GherkinElement.class);
+		}
 		return result;
 	}
 
