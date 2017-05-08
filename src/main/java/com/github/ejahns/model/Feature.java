@@ -7,7 +7,8 @@ import com.github.ejahns.Token;
 
 public class Feature implements GherkinElement {
 
-	private String location;
+	private String absoluteLocation;
+	private String relativeLocation;
 	private int lineNum;
 	private List<String> tags = new ArrayList<>();
 	private String featureName;
@@ -15,13 +16,23 @@ public class Feature implements GherkinElement {
 	private Background background;
 	private List<AbstractScenario> scenarios = new ArrayList<>();
 
-	public String getLocation() {
-		return location;
+
+	public String getAbsoluteLocation() {
+		return absoluteLocation;
 	}
 
 	//TODO don't expose this method
-	public void setLocation(String location) {
-		this.location = location;
+	public void setAbsoluteLocation(String absoluteLocation) {
+		this.absoluteLocation = absoluteLocation;
+	}
+
+	public String getRelativeLocation() {
+		return relativeLocation;
+	}
+
+	//TODO don't expose this method
+	public void setRelativeLocation(String relativeLocation) {
+		this.relativeLocation = relativeLocation;
 	}
 
 	public int getLineNum() {

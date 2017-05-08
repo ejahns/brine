@@ -23,7 +23,7 @@ public class PickleJar {
 		//TODO better way to handle location?
 		Path activeDir = Paths.get(System.getProperty("user.dir"));
 		Path rel = activeDir.relativize(Paths.get(file.toURI()));
-		ferment.setLocation(rel.toString().replaceAll("\\\\", "/"));
+		ferment.setRelativeLocation(rel.toString().replaceAll("\\\\", "/"));
 		return ferment;
 	}
 
