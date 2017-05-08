@@ -9,11 +9,13 @@ the implementation provided by [cucumber/gherkin](https://github.com/cucumber/gh
 brine allows tags to include spaces, but does not allow multiple tags on the same line.
 
 brine uses a slightly simplified grammar for Gherkin that produces a simplified object model. Additionally,
-brine produces a single object that captures all known information about a `.feature`, including
+brine produces a single object (`Feature`) that captures all known information about a `.feature`, including
 its location.
 
 Unlike [cucumber/gherkin](https://github.com/cucumber/gherkin), brine produces no intermediate
-abstract syntax tree (AST); rather, it generates a `Feature` directly.  
+abstract syntax tree (AST); rather, it generates a `Feature` directly. Also note that brine does
+not associate tags hierarchically, i.e. a `Scenario` contains only the tags explicitly placed
+on the represented Scenario, and does not include tags on the Feature.
 
 ## How to Use
 
