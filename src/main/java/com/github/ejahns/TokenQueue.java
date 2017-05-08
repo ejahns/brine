@@ -6,6 +6,7 @@ import java.io.Reader;
 import java.util.ArrayDeque;
 import java.util.Deque;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 
 import com.google.common.collect.ImmutableMap;
@@ -13,6 +14,9 @@ import com.google.common.collect.ImmutableMap;
 import static com.github.ejahns.Parser.TokenType.*;
 
 public class TokenQueue {
+
+	private List<String> errors;
+	private boolean collectErrors = false;
 
 	private static final Map<String, Parser.TokenType> lineKeys =
 		ImmutableMap.of(
@@ -37,6 +41,12 @@ public class TokenQueue {
 	}
 
 	public TokenQueue(Reader reader) {
+		readToQueue(reader);
+	}
+
+	public TokenQueue(Reader reader, List<String> errors) {
+		this.collectErrors = true;
+		this.errors = errors;
 		readToQueue(reader);
 	}
 
@@ -87,7 +97,12 @@ public class TokenQueue {
 		}
 		if (trimmed.startsWith("|")) {
 			if (!trimmed.endsWith("|")) {
-				throw new TokenizerException("expected final '|' at end of line: " + trimmed);
+				TokenizerException error = new TokenizerException("expected final '|' at end of line: " + trimmed);
+				if (!collectErrors) {
+					throw error;
+				}
+				errors.add(error.toString());
+				return null;
 			}
 			return new Token(trimmed, TableRowToken, i);
 		}
