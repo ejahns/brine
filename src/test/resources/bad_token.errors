@@ -1,0 +1,1 @@
+com.github.ejahns.TokenizerException: expected final '|' at end of line 6: | good | good | bad

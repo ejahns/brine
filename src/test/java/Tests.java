@@ -37,6 +37,14 @@ public class Tests {
 	}
 
 	@Test
+	public void badToken() throws IOException {
+		assertFeatureGiversErrors(
+			"src/test/resources/bad_token.feature",
+			"src/test/resources/bad_token.errors"
+		);
+	}
+
+	@Test
 	public void dataTable() throws FileNotFoundException {
 		assertFeatureMatchesJson(
 			"src/test/resources/data_table.feature",
