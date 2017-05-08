@@ -27,11 +27,11 @@ Gherkin, ignoring any invalid lines.
 
 ### Exception Types
 
-##### TokenizerException
+#### TokenizerException
 *thrown when a line is encountered that the tokenizer cannot interpret, 
 e.g. a examples/table line without a terminating `|`*
 
-##### ParserException
+#### ParserException
 *thrown when a line is encountered that was properly tokenized, 
 but violates the Gherkin grammar, e.g. a description line between two steps*
 
