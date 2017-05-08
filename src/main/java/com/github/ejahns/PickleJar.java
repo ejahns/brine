@@ -24,6 +24,7 @@ public class PickleJar {
 		Path activeDir = Paths.get(System.getProperty("user.dir"));
 		Path rel = activeDir.relativize(Paths.get(file.toURI()));
 		ferment.setRelativeLocation(rel.toString().replaceAll("\\\\", "/"));
+		ferment.setAbsoluteLocation(rel.toAbsolutePath().toString().replaceAll("\\\\", "/"));
 		return ferment;
 	}
 

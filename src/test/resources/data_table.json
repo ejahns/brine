@@ -1,5 +1,5 @@
 {
-	"location": "src/test/resources/data_table.feature",
+	"relativeLocation": "src/test/resources/data_table.feature",
 	"lineNum": 1,
 	"tags": [],
 	"featureName": "Some Feature",

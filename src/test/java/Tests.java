@@ -48,6 +48,7 @@ public class Tests {
 
 	private void assertFeatureMatchesJson(String feature, String json) throws FileNotFoundException {
 		Feature cure = PickleJar.cure(new File(feature));
+		cure.setAbsoluteLocation(null);
 		JsonReader jsonReader = new JsonReader(new FileReader(json));
 		JsonElement jsonString = new JsonParser().parse(jsonReader);
 		assertEquals(new Gson().toJsonTree(cure), jsonString);
