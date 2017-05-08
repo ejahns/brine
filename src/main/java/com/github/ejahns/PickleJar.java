@@ -45,7 +45,7 @@ public class PickleJar {
 	}
 
 	private static Feature cureCollectErrors(FileReader fileReader, List<String> errors) {
-		TokenQueue tokenQueue = new TokenQueue(fileReader);
+		TokenQueue tokenQueue = new TokenQueue(fileReader, errors);
 		return (new Parser()).parse(tokenQueue, errors);
 	}
 }
