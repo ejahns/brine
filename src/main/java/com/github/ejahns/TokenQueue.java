@@ -15,9 +15,6 @@ import static com.github.ejahns.Parser.TokenType.*;
 
 public class TokenQueue {
 
-	private List<String> errors;
-	private boolean collectErrors = false;
-
 	private static final Map<String, Parser.TokenType> lineKeys =
 		ImmutableMap.of(
 			"Given ", StepLineToken,
@@ -31,9 +28,12 @@ public class TokenQueue {
 			"Feature:", FeatureLineToken,
 			"Scenario:", ScenarioLineToken,
 			"Scenario Outline:", ScenarioOutlineLineToken,
-			"Background:", BackgroundLineToken
+			"Background:", BackgroundLineToken,
+			"Examples:", ExamplesLineToken
 		);
 
+	private List<String> errors;
+	private boolean collectErrors = false;
 	private Deque<Token> tokens = new ArrayDeque<>();
 
 	public TokenQueue() {
@@ -97,7 +97,12 @@ public class TokenQueue {
 		}
 		if (trimmed.startsWith("|")) {
 			if (!trimmed.endsWith("|")) {
-				TokenizerException error = new TokenizerException("expected final '|' at end of line: " + trimmed);
+				TokenizerException error = new TokenizerException(
+					String.format(
+						"expected final '|' at end of line %s: %s",
+						i,
+						trimmed)
+				);
 				if (!collectErrors) {
 					throw error;
 				}
