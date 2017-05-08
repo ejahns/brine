@@ -5,8 +5,12 @@ brine is a light-weight parser for Gherkin written in Java.
 ## Intentions
 
 brine is intended to produce a object representation of a Gherkin `.feature` file consistent
-the implementation provided by [cucumber/gherkin](https://github.com/cucumber/gherkin), with the exception
-brine allows tags to include spaces, but does not allow multiple tags on the same line.
+with the implementation provided by [cucumber/gherkin](https://github.com/cucumber/gherkin), 
+with the exception that brine allows tags to include spaces.
+brine also enforces some additional rules, namely:
+* Only one tag is allowed per line
+* A Feature must contain at least one Scenario/Scenario Outline
+* An examples table must contain at least one data row (i.e. only a header row is not allowed)
 
 brine uses a slightly simplified grammar for Gherkin that produces a simplified object model. Additionally,
 brine produces a single object (`Feature`) that captures all known information about a `.feature`, including
@@ -23,7 +27,7 @@ The main entry point for the brine library is the `PickleJar`, which can produce
 from a `File`, `Reader`, or `URI`.
 
 The various `cure` methods are fail-fast and will throw an exception if anything goes wrong. 
-The `cureCollectErrors` methods accept a `List<String>` which is populated with any errors 
+The `cureCollectErrors` methods accept a `List<String>` which will be populated with any errors 
 encountered by the tokenizer or parser. The methods return the `Feature` representing the
 Gherkin, ignoring any invalid lines.
 
@@ -54,8 +58,7 @@ Feature: README Feature
     Then there is some result
 ```
 
-
-Invoking PickleJar.cure() produces a `Feature` with the below json representation:
+Invoking PickleJar.cure() on the above produces a `Feature` with the below json representation:
 
 ```
 {
