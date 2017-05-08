@@ -1,0 +1,4 @@
+com.github.ejahns.ParserException$UnexpectedTokenException: Expected one of EOF, StepLine, TagLine, ScenarioLine, ScenarioOutlineLine, Other but got TagLine: @This doesn't go here!!! at line 12
+com.github.ejahns.ParserException$UnexpectedTokenException: Expected one of EOF, StepLine, TagLine, ScenarioLine, ScenarioOutlineLine, Other but got TagLine: @NoTagAllowedHere at line 17
+com.github.ejahns.ParserException$UnexpectedTokenException: Expected one of EOF, StepLine, TagLine, ScenarioLine, ScenarioOutlineLine, Other but got TableRow: | no  | table | allowed | here | at line 18
+com.github.ejahns.ParserException$UnexpectedTokenException: Expected one of EOF, StepLine, TagLine, ScenarioLine, ScenarioOutlineLine, Other but got TableRow: | bad |  bad  |   bad   |  bad | at line 19

@@ -1,11 +1,14 @@
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.Collectors;
 
 import org.junit.Test;
 
-import com.github.ejahns.ParserException;
 import com.github.ejahns.PickleJar;
 import com.github.ejahns.model.Feature;
 import com.google.gson.Gson;
@@ -26,16 +29,11 @@ public class Tests {
 	}
 
 	@Test
-	public void badFeature() throws IOException {
-		File file = new File("src/test/resources/sample_feature_bad.feature");
-		try {
-			PickleJar.cure(file);
-		}
-		catch (ParserException.UnexpectedTokenException e) {
-			assertEquals(e.getMessage(), "Expected one of EOF, StepLine, TagLine, ScenarioLine, ScenarioOutlineLine, Other but got TagLine: @This doesn't go here!!! at line 12");
-			return;
-		}
-		throw new IllegalStateException();
+	public void multipleUnexpectedTokens() throws IOException {
+		assertFeatureGiversErrors(
+			"src/test/resources/multiple_unexpected_tokens.feature",
+			"src/test/resources/multiple_unexpected_tokens.errors"
+			);
 	}
 
 	@Test
@@ -52,5 +50,14 @@ public class Tests {
 		JsonReader jsonReader = new JsonReader(new FileReader(json));
 		JsonElement jsonString = new JsonParser().parse(jsonReader);
 		assertEquals(new Gson().toJsonTree(cure), jsonString);
+	}
+
+	private void assertFeatureGiversErrors(String feature, String errors) throws FileNotFoundException {
+		ArrayList<String> actualErrorList = new ArrayList<>();
+		PickleJar.cureCollectErrors(new File(feature), actualErrorList);
+		FileReader fileReader = new FileReader(errors);
+		BufferedReader bufferedReader = new BufferedReader(fileReader);
+		List<String> expectedErrorList = bufferedReader.lines().collect(Collectors.toList());
+		assertEquals(expectedErrorList, actualErrorList);
 	}
 }

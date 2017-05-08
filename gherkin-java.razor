@@ -6,6 +6,7 @@
 package com.github.ejahns;
 
 import java.util.List;
+import java.util.Deque;
 import java.util.ArrayDeque;
 import java.util.Queue;
 
@@ -21,6 +22,8 @@ public class @Model.ParserClassName {
 
 	private GherkinElementStackHandler stackHandler = new GherkinElementStackHandler();
 	private TokenQueue queue;
+	private boolean collectErrors = false;
+    private List<String> errors;
 
 	public enum TokenType {
 		@foreach(var rule in Model.RuleSet.TokenRules)
@@ -47,6 +50,12 @@ public class @Model.ParserClassName {
 		return stackHandler.resolve();
 	}
 
+	public @Model.RuleSet.StartRule.Name parse(TokenQueue queue, List<String> errors) {
+		this.collectErrors = true;
+		this.errors = errors;
+		return parse(queue);
+	}
+
 	private int matchToken(int state, Token token) {
 		int newState;
 		switch(state) {
@@ -71,7 +80,7 @@ public class @Model.ParserClassName {
 		@:if (@matchToken(transition.TokenType)) {
 			if (transition.LookAheadHint != null)
 			{
-			@:if (lookahead_@(transition.LookAheadHint.Id)(token))
+			@:if (lookahead_@(transition.LookAheadHint.Id)())
 			@:{
 			}
 			foreach(var production in transition.Productions)
@@ -85,15 +94,15 @@ public class @Model.ParserClassName {
 			}
 		@:}
 		}
-		@HandleParserError(state.Transitions.Select(t => t.TokenType.ToString()).Distinct())
+		@HandleParserError(state.Transitions.Select(t => t.TokenType.ToString()).Distinct(), state)
 	}</text>
 }
 @foreach(var lookAheadHint in Model.RuleSet.LookAheadHints)
 {
 <text>
-	private boolean lookahead_@(lookAheadHint.Id)(Token currentToken) {
+	private boolean lookahead_@(lookAheadHint.Id)() {
 		Token token;
-		Queue<Token> newQueue = new ArrayDeque<Token>();
+		Deque<Token> newQueue = new ArrayDeque<>();
 		boolean match = false;
 		do
 		{
@@ -116,7 +125,7 @@ public class @Model.ParserClassName {
 			@:|| @matchToken(tokenType)
 		}
 		);
-		queue.add(newQueue);
+		queue.addToFront(newQueue);
 		return match;
 	}</text>
 }
@@ -135,9 +144,14 @@ public class @Model.ParserClassName {
 			break;
 	}
 }
-@helper HandleParserError(IEnumerable<string> expectedTokens)
+@helper HandleParserError(IEnumerable<string> expectedTokens, State state)
 {<text>
 		List<String> expectedTokens = asList("@Raw(string.Join("\", \"", expectedTokens))");
-		throw new UnexpectedTokenException(token.toString(), expectedTokens, token.getLineNum());</text>}
+		UnexpectedTokenException error = new UnexpectedTokenException(token.toString(), expectedTokens, token.getLineNum());
+		if(!collectErrors) {
+			throw error;
+		}
+		errors.add(error.toString());
+		return @state.Id;</text>}
 @helper matchToken(TokenType tokenType)
 {<text>token.getType().equals(@(tokenType)Token)</text>}

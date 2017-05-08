@@ -5,8 +5,8 @@ import java.io.LineNumberReader;
 import java.io.Reader;
 import java.util.ArrayDeque;
 import java.util.Deque;
+import java.util.Iterator;
 import java.util.Map;
-import java.util.Queue;
 
 import com.google.common.collect.ImmutableMap;
 
@@ -44,8 +44,15 @@ public class TokenQueue {
 		return tokens.pop();
 	}
 
-	public void add(Queue<Token> queue) {
+	public void add(Deque<Token> queue) {
 		tokens.addAll(queue);
+	}
+
+	public void addToFront(Deque<Token> queue) {
+		Iterator<Token> tokenIterator = queue.descendingIterator();
+		while (tokenIterator.hasNext()) {
+			tokens.addFirst(tokenIterator.next());
+		}
 	}
 
 	private void readToQueue(Reader reader) {

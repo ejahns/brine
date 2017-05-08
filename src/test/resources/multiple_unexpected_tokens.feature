@@ -14,6 +14,8 @@ Feature: Some Feature
     Then there is some result
 
   Scenario: Some other scenario
-
+  @NoTagAllowedHere
+  | no  | table | allowed | here |
+  | bad |  bad  |   bad   |  bad |
     When I do something else
     Then something else happens
