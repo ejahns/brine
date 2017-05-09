@@ -16,8 +16,8 @@ public class Main {
 			return;
 		}
 		File file = new File(args[0]);
-		Feature ferment = PickleJar.cure(file);
-		String json = new Gson().toJson(ferment);
+		Feature cure = PickleJar.cure(file);
+		String json = new Gson().toJson(cure);
 		System.out.print(json);
 		System.out.flush();
 	}
