@@ -5,8 +5,8 @@ import java.io.FileNotFoundException;
 import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
-import java.util.stream.Collectors;
 
 import com.beust.jcommander.JCommander;
 import com.beust.jcommander.Parameter;
@@ -22,6 +22,9 @@ public class Main {
 	@Parameter(names = {"-p", "--pretty"}, description = "Print pretty json")
 	private boolean pretty;
 
+	@Parameter(names = {"-s", "--suppress"}, description = "Suppress json output, only reports feature validity")
+	private boolean suppress;
+
 	@Parameter(description = "Feature files to be parsed")
 	private List<String> files;
 
@@ -35,7 +38,14 @@ public class Main {
 	}
 
 	public void run() throws FileNotFoundException {
-		List<File> fileList = files.stream().map(File::new).collect(Collectors.toList());
+		ArrayList<File> fileList = new ArrayList<>();
+		for (String s : files) {
+			File f = new File(s);
+			File[] files = f.listFiles((d, name) -> name.endsWith(".feature"));
+			if (files != null) {
+				fileList.addAll(Arrays.asList(files));
+			}
+		}
 		Gson gson;
 		if (!pretty) {
 			gson = new Gson();
@@ -50,13 +60,29 @@ public class Main {
 				System.out.println(gson.toJson(cure));
 			}
 			else {
+				System.out.println("------------------------------------------------------------------------------------");
 				System.out.println(f.toString());
+				System.out.println("------------------------------------------------------------------------------------");
 				List<String> errors = new ArrayList<>();
 				Feature cure = PickleJar.cureCollectErrors(f, errors);
-				for (String s : errors) {
-					System.out.println(s);
+				if (errors.size() > 0) {
+					System.out.println("\terrors:");
+					for (String s : errors) {
+						System.out.println("\t\t" + s);
+					}
+					if (!suppress) {
+						System.out.println(gson.toJson(cure));
+					}
 				}
-				System.out.println(gson.toJson(cure));
+				else {
+					if (!suppress) {
+						System.out.println(gson.toJson(cure));
+					}
+					else {
+						System.out.println("\tvalid");
+					}
+				}
+				System.out.println();
 			}
 		}
 	}
