@@ -40,7 +40,7 @@ public class Token {
 	}
 
 	public boolean isEOF() {
-		return null == line;
+		return type.equals(TokenType.EOFToken);
 	}
 
 	@Override

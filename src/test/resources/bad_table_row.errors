@@ -1,0 +1,1 @@
+com.github.ejahns.ParserException$UnexpectedTableRowException: Expected row with 2 cells but got 3 cells at line 6: [good, good, bad]

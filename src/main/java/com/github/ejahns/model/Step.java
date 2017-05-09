@@ -1,32 +1,43 @@
 package com.github.ejahns.model;
 
-import com.github.ejahns.Token;
+import com.github.ejahns.model.interfaces.GherkinElement;
 
 public class Step implements GherkinElement {
 
-	private int lineNum;
+	private int line;
 	private String keyword;
 	private String step;
 	private DataTable dataTable;
 
-	@Override
-	public boolean add(GherkinElement t) {
-		if (t instanceof DataTable) {
-			this.dataTable = (DataTable) t;
-			return true;
-		}
-		return false;
+	public int getLine() {
+		return line;
 	}
 
-	@Override
-	public boolean consume(Token t) {
-		switch (t.getType()) {
-			case StepLineToken:
-				this.keyword = t.getKeyword();
-				this.step = t.getLine();
-				this.lineNum = t.getLineNum();
-				return true;
-		}
-		return false;
+	public void setLine(int line) {
+		this.line = line;
+	}
+
+	public String getKeyword() {
+		return keyword;
+	}
+
+	public void setKeyword(String keyword) {
+		this.keyword = keyword;
+	}
+
+	public String getStep() {
+		return step;
+	}
+
+	public void setStep(String step) {
+		this.step = step;
+	}
+
+	public DataTable getDataTable() {
+		return dataTable;
+	}
+
+	public void setDataTable(DataTable dataTable) {
+		this.dataTable = dataTable;
 	}
 }

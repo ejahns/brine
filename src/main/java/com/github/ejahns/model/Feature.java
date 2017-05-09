@@ -1,21 +1,23 @@
 package com.github.ejahns.model;
 
-import java.util.ArrayList;
 import java.util.List;
 
-import com.github.ejahns.Token;
+import com.github.ejahns.model.interfaces.hastoken.HasDescription;
+import com.github.ejahns.model.interfaces.hastoken.HasLineNumber;
+import com.github.ejahns.model.interfaces.hastoken.HasName;
+import com.github.ejahns.model.interfaces.haselement.HasTags;
 
-public class Feature implements GherkinElement {
+public class Feature implements HasLineNumber, HasTags, HasName, HasDescription {
 
 	private String absoluteLocation;
 	private String relativeLocation;
-	private int lineNum;
-	private List<String> tags = new ArrayList<>();
-	private String featureName;
-	private List<String> description = new ArrayList<>();
-	private Background background;
-	private List<AbstractScenario> scenarios = new ArrayList<>();
 
+	private int line;
+	private List<String> tags;
+	private String name;
+	private List<String> description;
+	private Background background;
+	private List<AbstractScenario> scenarios;
 
 	public String getAbsoluteLocation() {
 		return absoluteLocation;
@@ -35,59 +37,59 @@ public class Feature implements GherkinElement {
 		this.relativeLocation = relativeLocation;
 	}
 
-	public int getLineNum() {
-		return lineNum;
+	@Override
+	public int getLine() {
+		return line;
 	}
 
+	@Override
+	public void setLine(int line) {
+		this.line = line;
+	}
+
+	@Override
 	public List<String> getTags() {
 		return tags;
 	}
 
-	public String getFeatureName() {
-		return featureName;
+	@Override
+	public void setTags(List<String> tags) {
+		this.tags = tags;
 	}
 
+	@Override
+	public String getName() {
+		return name;
+	}
+
+	@Override
+	public void setName(String name) {
+		this.name = name;
+	}
+
+	@Override
 	public List<String> getDescription() {
 		return description;
+	}
+
+	@Override
+	public void setDescription(List<String> description) {
+		this.description = description;
 	}
 
 	public Background getBackground() {
 		return background;
 	}
 
+	public void setBackground(Background background) {
+		this.background = background;
+	}
+
 	public List<AbstractScenario> getScenarios() {
 		return scenarios;
 	}
 
-	@Override
-	public boolean add(GherkinElement t) {
-		if (t instanceof AbstractScenario) {
-			scenarios.add((AbstractScenario) t);
-			return true;
-		}
-		else if (t instanceof Background) {
-			background = (Background) t;
-			return true;
-		}
-		return false;
-	}
-
-	@Override
-	public boolean consume(Token t) {
-		switch (t.getType()) {
-			case OtherToken:
-				description.add(t.getLine());
-				return true;
-			case TagLineToken:
-				tags.add(t.getLine());
-				return true;
-			case FeatureLineToken:
-				lineNum = t.getLineNum();
-				featureName = t.getLine();
-				return true;
-			case EOFToken:
-				return true;
-		}
-		return false;
+	public void setScenarios(List<AbstractScenario> scenarios) {
+		this.scenarios = scenarios;
 	}
 }

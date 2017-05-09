@@ -114,12 +114,14 @@ public class TokenQueue {
 		for (String key : lineKeys.keySet()) {
 			if (trimmed.startsWith(key)) {
 				trimmed = trimmed.replaceFirst(key, "").trim();
+				trimmed = trimmed.equals("") ? null : trimmed;
 				return new Token(key.trim(), trimmed, lineKeys.get(key), i);
 			}
 		}
 		for (String key : stepKeys.keySet()) {
 			if (trimmed.startsWith(key)) {
 				trimmed = trimmed.replaceFirst(key, "").trim();
+				trimmed = trimmed.equals("") ? null : trimmed;
 				return new Token(key, trimmed, stepKeys.get(key), i);
 			}
 		}

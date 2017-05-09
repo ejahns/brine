@@ -1,36 +1,42 @@
 {
 	"relativeLocation": "src/test/resources/data_table.feature",
-	"lineNum": 1,
-	"tags": [],
-	"featureName": "Some Feature",
-	"description": [],
+	"line": 1,
+	"name": "Some Feature",
 	"scenarios": [
 		{
-			"lineNum": 3,
-			"scenarioName": "Some Scenario",
-			"description": [],
+			"line": 3,
+			"name": "Some Scenario",
 			"steps": [
 				{
-					"lineNum": 4,
+					"line": 4,
 					"keyword": "Given",
 					"step": "some step with a tic-tac-toe board:",
 					"dataTable": {
-						"dataTable": [
-							[
-								"",
-								"x",
-								"o"
-							],
-							[
-								"o",
-								"",
-								"x"
-							],
-							[
-								"x",
-								"",
-								""
-							]
+						"tableRows": [
+							{
+								"line": 5,
+								"cells": [
+									"",
+									"x",
+									"o"
+								]
+							},
+							{
+								"line": 6,
+								"cells": [
+									"o",
+									"",
+									"x"
+								]
+							},
+							{
+								"line": 7,
+								"cells": [
+									"x",
+									"",
+									""
+								]
+							}
 						]
 					}
 				}

@@ -53,6 +53,7 @@ public class @Model.ParserClassName {
 	public @Model.RuleSet.StartRule.Name parse(TokenQueue queue, List<String> errors) {
 		this.collectErrors = true;
 		this.errors = errors;
+		this.stackHandler.setCollectErrors(errors);
 		return parse(queue);
 	}
 

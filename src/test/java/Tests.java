@@ -45,6 +45,14 @@ public class Tests {
 	}
 
 	@Test
+	public void badTableRow() throws IOException {
+		assertFeatureGiversErrors(
+			"src/test/resources/bad_table_row.feature",
+			"src/test/resources/bad_table_row.errors"
+		);
+	}
+
+	@Test
 	public void dataTable() throws FileNotFoundException {
 		assertFeatureMatchesJson(
 			"src/test/resources/data_table.feature",

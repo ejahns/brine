@@ -4,6 +4,8 @@ import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
 
+import com.github.ejahns.model.TableRow;
+
 public class ParserException extends RuntimeException {
 
 	ParserException(String message) {
@@ -12,26 +14,26 @@ public class ParserException extends RuntimeException {
 
 	public static class UnexpectedTableRowException extends ParserException {
 
-		private String token;
+		private TableRow row;
 		private int expectedCount;
 		private int actualCount;
 		private int lineNum;
 
-		public UnexpectedTableRowException(String token, int expectedCount, int actualCount, int lineNum) {
-			super(getMessage(token, expectedCount, actualCount, lineNum));
-			this.token = token;
+		public UnexpectedTableRowException(TableRow row, int expectedCount, int actualCount, int lineNum) {
+			super(getMessage(row, expectedCount, actualCount, lineNum));
+			this.row = row;
 			this.expectedCount = expectedCount;
 			this.actualCount = actualCount;
 			this.lineNum = lineNum;
 		}
 
-		private static String getMessage(String token, int expectedCount, int actualCount, int lineNum) {
+		private static String getMessage(TableRow row, int expectedCount, int actualCount, int lineNum) {
 			return
 				String.format("Expected row with %s cells but got %s cells at line %s: %s",
 					expectedCount,
 					actualCount,
 					lineNum,
-					token
+					row
 				);
 		}
 	}

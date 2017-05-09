@@ -1,39 +1,35 @@
 package com.github.ejahns.model;
 
-import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
-import com.github.ejahns.ParserException;
-import com.github.ejahns.Token;
+import com.github.ejahns.model.interfaces.haselement.HasTableRows;
 
-public class ExamplesTable implements GherkinElement {
+public class ExamplesTable implements HasTableRows {
 
-	private List<List<String>> examples = new ArrayList<>();
+	private TableRow header;
+	private List<TableRow> tableRows;
 
-	@Override
-	public boolean add(GherkinElement t) {
-		return false;
+	public TableRow getHeader() {
+		return header;
+	}
+
+	public void setHeader(TableRow header) {
+		this.header = header;
 	}
 
 	@Override
-	public boolean consume(Token t) {
-		switch (t.getType()) {
-			case TableRowToken:
-				String line = t.getLine();
-				String[] split = line.split("\\|");
-				ArrayList<String> row = new ArrayList<>();
-				for (int i = 1; i < split.length; i++) {
-					row.add(split[i].trim());
-				}
-				if (examples.size() > 0) {
-					List<String> lastRow = examples.get(examples.size() - 1);
-					if (lastRow.size() != row.size()) {
-						throw new ParserException.UnexpectedTableRowException(line, lastRow.size(), row.size(), t.getLineNum());
-					}
-				}
-				examples.add(row);
-				return true;
-		}
-		return false;
+	public List<TableRow> getTableRows() {
+		return tableRows;
+	}
+
+	@Override
+	public void setTableRows(List<TableRow> tableRows) {
+		this.tableRows = tableRows;
+	}
+
+	@Override
+	public List<List<String>> generateTable() {
+		return tableRows.stream().map(TableRow::getCells).collect(Collectors.toList());
 	}
 }

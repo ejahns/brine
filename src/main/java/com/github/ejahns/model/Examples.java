@@ -1,30 +1,65 @@
 package com.github.ejahns.model;
 
-import com.github.ejahns.Token;
+import java.util.List;
 
-public class Examples implements GherkinElement {
+import com.github.ejahns.model.interfaces.hastoken.HasDescription;
+import com.github.ejahns.model.interfaces.hastoken.HasLineNumber;
+import com.github.ejahns.model.interfaces.hastoken.HasName;
+import com.github.ejahns.model.interfaces.haselement.HasTags;
 
-	private int lineNum;
-	private String examplesName;
+public class Examples implements HasLineNumber, HasTags, HasName, HasDescription {
+
+	private int line;
+	private List<String> tags;
+	private String name;
+	private List<String> description;
 	private ExamplesTable examplesTable;
 
 	@Override
-	public boolean add(GherkinElement t) {
-		if (t instanceof ExamplesTable) {
-			this.examplesTable = (ExamplesTable) t;
-			return true;
-		}
-		return false;
+	public int getLine() {
+		return line;
 	}
 
 	@Override
-	public boolean consume(Token t) {
-		switch (t.getType()) {
-			case ExamplesLineToken:
-				this.lineNum = t.getLineNum();
-				this.examplesName = t.getLine();
-				return true;
-		}
-		return false;
+	public void setLine(int line) {
+		this.line = line;
+	}
+
+	@Override
+	public List<String> getTags() {
+		return tags;
+	}
+
+	@Override
+	public void setTags(List<String> tags) {
+		this.tags = tags;
+	}
+
+	@Override
+	public String getName() {
+		return name;
+	}
+
+	@Override
+	public void setName(String name) {
+		this.name = name;
+	}
+
+	@Override
+	public List<String> getDescription() {
+		return description;
+	}
+
+	@Override
+	public void setDescription(List<String> description) {
+		this.description = description;
+	}
+
+	public ExamplesTable getExamplesTable() {
+		return examplesTable;
+	}
+
+	public void setExamplesTable(ExamplesTable examplesTable) {
+		this.examplesTable = examplesTable;
 	}
 }

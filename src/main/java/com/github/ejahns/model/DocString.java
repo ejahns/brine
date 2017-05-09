@@ -1,17 +1,19 @@
 package com.github.ejahns.model;
 
-import com.github.ejahns.Token;
+import java.util.List;
+
+import com.github.ejahns.model.interfaces.GherkinElement;
 
 //TODO implement
 public class DocString implements GherkinElement {
 
-	@Override
-	public boolean add(GherkinElement t) {
-		return false;
+	private List<String> lines;
+
+	public List<String> getLines() {
+		return lines;
 	}
 
-	@Override
-	public boolean consume(Token t) {
-		return false;
+	public void setLines(List<String> lines) {
+		this.lines = lines;
 	}
 }

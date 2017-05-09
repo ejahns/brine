@@ -1,26 +1,24 @@
 {
 	"relativeLocation": "src/test/resources/sample_feature.feature",
-	"lineNum": 3,
+	"line": 3,
 	"tags": [
 		"@Some Tag",
 		"@Meta(\"Some tag with an argument\")"
 	],
-	"featureName": "Some Feature",
+	"name": "Some Feature",
 	"description": [
 		"Some description."
 	],
 	"background": {
-		"lineNum": 6,
-		"backgroundName": "",
-		"description": [],
+		"line": 6,
 		"steps": [
 			{
-				"lineNum": 7,
+				"line": 7,
 				"keyword": "Given",
 				"step": "some common condition"
 			},
 			{
-				"lineNum": 8,
+				"line": 8,
 				"keyword": "And",
 				"step": "something else"
 			}
@@ -28,36 +26,35 @@
 	},
 	"scenarios": [
 		{
-			"lineNum": 10,
-			"scenarioName": "Some Scenario",
+			"line": 10,
+			"name": "Some Scenario",
 			"description": [
 				"Some scenario description."
 			],
 			"steps": [
 				{
-					"lineNum": 13,
+					"line": 13,
 					"keyword": "When",
 					"step": "I do something"
 				},
 				{
-					"lineNum": 14,
+					"line": 14,
 					"keyword": "Then",
 					"step": "there is some result"
 				}
 			]
 		},
 		{
-			"lineNum": 16,
-			"scenarioName": "Some other scenario",
-			"description": [],
+			"line": 16,
+			"name": "Some other scenario",
 			"steps": [
 				{
-					"lineNum": 18,
+					"line": 18,
 					"keyword": "When",
 					"step": "I do something else"
 				},
 				{
-					"lineNum": 19,
+					"line": 19,
 					"keyword": "Then",
 					"step": "something else happens"
 				}
