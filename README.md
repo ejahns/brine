@@ -64,36 +64,33 @@ Invoking PickleJar.cure() on the above produces a `Feature` with the below json 
 {
    "absoluteLocation":"C:/experiment/brine/src/main/resources/readme_example.feature",
    "relativeLocation":"src/main/resources/readme_example.feature",
-   "lineNum":3,
+   "line":3,
    "tags":[
       "@NormalTag",
       "@Meta(\"this tag has spaces\")"
    ],
-   "featureName":"README Feature",
-   "description":[
-
-   ],
+   "name":"README Feature",
    "scenarios":[
       {
-         "lineNum":5,
-         "scenarioName":"README Scenario",
+         "line":5,
+         "name":"README Scenario",
          "description":[
             "A simple explanation of this scenario.",
             "Just a little more information."
          ],
          "steps":[
             {
-               "lineNum":9,
+               "line":9,
                "keyword":"Given",
                "step":"some initial condition"
             },
             {
-               "lineNum":10,
+               "line":10,
                "keyword":"When",
                "step":"a user performs an action"
             },
             {
-               "lineNum":11,
+               "line":11,
                "keyword":"Then",
                "step":"there is some result"
             }
