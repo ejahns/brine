@@ -150,6 +150,12 @@
 			<version>3.5</version>
 		</dependency>
 
+		<dependency>
+			<groupId>com.beust</groupId>
+			<artifactId>jcommander</artifactId>
+			<version>1.71</version>
+		</dependency>
+
 	</dependencies>
 
 </project>
