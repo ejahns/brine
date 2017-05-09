@@ -33,7 +33,7 @@ public class Tests {
 		assertFeatureGiversErrors(
 			"src/test/resources/multiple_unexpected_tokens.feature",
 			"src/test/resources/multiple_unexpected_tokens.errors"
-			);
+		);
 	}
 
 	@Test
