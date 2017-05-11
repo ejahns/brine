@@ -62,7 +62,7 @@ public class TokenProvider {
 		catch (TokenizerException e) {
 			if (collectErrors) {
 				errors.add(e.toString());
-				return null;
+				return readNextToken();
 			}
 			throw e;
 		}
