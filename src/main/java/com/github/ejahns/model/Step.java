@@ -8,6 +8,7 @@ public class Step implements GherkinElement {
 	private String keyword;
 	private String step;
 	private DataTable dataTable;
+	private DocString docString;
 
 	public int getLine() {
 		return line;
@@ -39,5 +40,13 @@ public class Step implements GherkinElement {
 
 	public void setDataTable(DataTable dataTable) {
 		this.dataTable = dataTable;
+	}
+
+	public DocString getDocString() {
+		return docString;
+	}
+
+	public void setDocString(DocString docString) {
+		this.docString = docString;
 	}
 }

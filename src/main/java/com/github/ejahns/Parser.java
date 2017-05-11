@@ -25,7 +25,7 @@ import static java.util.Arrays.*;
 
 public class Parser {
 
-	private GherkinElementStackHandler stackHandler = new GherkinElementStackHandler();
+	private final GherkinElementStackHandler stackHandler = new GherkinElementStackHandler();
 	private TokenQueue queue;
 	private boolean collectErrors = false;
     private List<String> errors;
@@ -979,7 +979,7 @@ public class Parser {
 			return 17;
 		}
 		if (token.getType().equals(TagLineToken)) {
-			if (lookahead_1())
+			if (lookahead_2())
 			{
 			stackHandler.collapse(TableRow.class);
 			stackHandler.collapse(ExamplesTable.class);
@@ -1338,6 +1338,31 @@ public class Parser {
 
 			if (false
 				|| token.getType().equals(ScenarioOutlineLineToken)
+			)
+			{
+				match = true;
+				break;
+			}
+		} while (false
+			|| token.getType().equals(EmptyToken)
+			|| token.getType().equals(CommentToken)
+			|| token.getType().equals(TagLineToken)
+		);
+		queue.addToFront(newQueue);
+		return match;
+	}
+
+	private boolean lookahead_2() {
+		Token token;
+		Deque<Token> newQueue = new ArrayDeque<>();
+		boolean match = false;
+		do
+		{
+			token = queue.next();
+			newQueue.add(token);
+
+			if (false
+				|| token.getType().equals(ExamplesLineToken)
 			)
 			{
 				match = true;

@@ -5,7 +5,6 @@ import java.io.FileNotFoundException;
 import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 import com.beust.jcommander.JCommander;
@@ -45,14 +44,10 @@ public class Main {
 		main.run();
 	}
 
-	public void run() throws FileNotFoundException {
+	private void run() throws FileNotFoundException {
 		ArrayList<File> fileList = new ArrayList<>();
 		for (String s : files) {
-			File f = new File(s);
-			File[] files = f.listFiles((d, name) -> name.endsWith(".feature"));
-			if (files != null) {
-				fileList.addAll(Arrays.asList(files));
-			}
+			findFeatures(new File(s), fileList);
 		}
 		Gson gson;
 		if (!pretty) {
@@ -63,34 +58,52 @@ public class Main {
 		}
 		for (File f : fileList) {
 			if (!logErrors) {
-				System.out.println(f.toString());
+				Writers.out.println("------------------------------------------------------------------------------------");
+				Writers.out.println(f.toString());
+				Writers.out.println("------------------------------------------------------------------------------------");
 				Feature cure = PickleJar.cure(f);
-				System.out.println(gson.toJson(cure));
+				Writers.out.println(gson.toJson(cure));
+				Writers.out.println();
 			}
 			else {
-				System.out.println("------------------------------------------------------------------------------------");
-				System.out.println(f.toString());
-				System.out.println("------------------------------------------------------------------------------------");
+				Writers.out.println("------------------------------------------------------------------------------------");
+				Writers.out.println(f.toString());
+				Writers.out.println("------------------------------------------------------------------------------------");
 				List<String> errors = new ArrayList<>();
 				Feature cure = PickleJar.cureCollectErrors(f, errors);
 				if (errors.size() > 0) {
-					System.out.println("\terrors:");
+					Writers.out.println("\terrors:");
 					for (String s : errors) {
-						System.out.println("\t\t" + s);
+						Writers.out.println("\t\t" + s);
 					}
 					if (!suppress) {
-						System.out.println(gson.toJson(cure));
+						Writers.out.println(gson.toJson(cure));
 					}
 				}
 				else {
 					if (!suppress) {
-						System.out.println(gson.toJson(cure));
+						Writers.out.println(gson.toJson(cure));
 					}
 					else {
-						System.out.println("\tvalid");
+						Writers.out.println("\tvalid");
 					}
 				}
-				System.out.println();
+				Writers.out.println();
+			}
+		}
+	}
+
+	private void findFeatures(File f, List<File> features) {
+		if (f.isFile()) {
+			if (f.getName().endsWith(".feature")) {
+				features.add(f);
+			}
+			return;
+		}
+		File[] files = f.listFiles();
+		if (files != null) {
+			for (File f2 : files) {
+				findFeatures(f2, features);
 			}
 		}
 	}

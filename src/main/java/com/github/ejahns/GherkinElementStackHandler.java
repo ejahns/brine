@@ -7,12 +7,12 @@ import java.util.List;
 import com.github.ejahns.model.Feature;
 import com.github.ejahns.model.interfaces.GherkinElement;
 
-public class GherkinElementStackHandler {
+class GherkinElementStackHandler {
 
 	private List<String> errors;
 	private boolean collectErrors = false;
 
-	private Deque<GherkinElement> stack = new ArrayDeque<>();
+	private final Deque<GherkinElement> stack = new ArrayDeque<>();
 	private Feature result = null;
 
 	public void setCollectErrors(List<String> errors) {

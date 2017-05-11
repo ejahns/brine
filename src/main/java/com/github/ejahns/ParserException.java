@@ -6,7 +6,7 @@ import org.apache.commons.lang3.StringUtils;
 
 import com.github.ejahns.model.TableRow;
 
-public class ParserException extends RuntimeException {
+class ParserException extends RuntimeException {
 
 	ParserException(String message) {
 		super(message);
@@ -14,10 +14,10 @@ public class ParserException extends RuntimeException {
 
 	public static class UnexpectedTableRowException extends ParserException {
 
-		private TableRow row;
-		private int expectedCount;
-		private int actualCount;
-		private int lineNum;
+		private final TableRow row;
+		private final int expectedCount;
+		private final int actualCount;
+		private final int lineNum;
 
 		public UnexpectedTableRowException(TableRow row, int expectedCount, int actualCount, int lineNum) {
 			super(getMessage(row, expectedCount, actualCount, lineNum));
@@ -40,9 +40,9 @@ public class ParserException extends RuntimeException {
 
 	public static class UnexpectedTokenException extends ParserException {
 
-		private String token;
-		private List<String> expectedTypes;
-		private int lineNum;
+		private final String token;
+		private final List<String> expectedTypes;
+		private final int lineNum;
 
 		public UnexpectedTokenException(String token, List<String> expectedTypes, int lineNum) {
 			super(getMessage(token, expectedTypes, lineNum));

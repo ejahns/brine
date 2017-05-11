@@ -5,13 +5,14 @@ import java.util.ArrayList;
 import com.github.ejahns.model.AbstractScenario;
 import com.github.ejahns.model.Background;
 import com.github.ejahns.model.DataTable;
+import com.github.ejahns.model.DocString;
 import com.github.ejahns.model.Feature;
 import com.github.ejahns.model.interfaces.GherkinElement;
 import com.github.ejahns.model.Step;
 import com.github.ejahns.model.TableRow;
 import com.github.ejahns.model.interfaces.haselement.HasSteps;
 
-public class GherkinElementConsumptionHandler {
+class GherkinElementConsumptionHandler {
 
 	//TODO implement handling for ExamplesTable
 	public static void consume(GherkinElement e1, GherkinElement e2) {
@@ -49,6 +50,10 @@ public class GherkinElementConsumptionHandler {
 			((Step) e1).setDataTable((DataTable) e2);
 			return;
 		}
-		return;
+		if (e1 instanceof Step && e2 instanceof DocString) {
+			((Step)e1).setDocString((DocString) e2);
+			return;
+		}
+		throw new RuntimeException();
 	}
 }

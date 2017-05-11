@@ -13,7 +13,7 @@ import com.github.ejahns.model.Feature;
 
 public class PickleJar {
 
-	public static Feature cure(Reader reader) {
+	private static Feature cure(Reader reader) {
 		TokenQueue tokenQueue = new TokenQueue(reader);
 		return new Parser().parse(tokenQueue);
 	}

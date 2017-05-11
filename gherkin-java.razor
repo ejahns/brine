@@ -20,7 +20,7 @@ import static java.util.Arrays.*;
 
 public class @Model.ParserClassName {
 
-	private GherkinElementStackHandler stackHandler = new GherkinElementStackHandler();
+	private final GherkinElementStackHandler stackHandler = new GherkinElementStackHandler();
 	private TokenQueue queue;
 	private boolean collectErrors = false;
     private List<String> errors;

@@ -13,7 +13,7 @@ import com.google.common.collect.ImmutableMap;
 
 import static com.github.ejahns.Parser.TokenType.*;
 
-public class TokenQueue {
+class TokenQueue {
 
 	private static final Map<String, Parser.TokenType> lineKeys =
 		ImmutableMap.of(
@@ -34,7 +34,9 @@ public class TokenQueue {
 
 	private List<String> errors;
 	private boolean collectErrors = false;
-	private Deque<Token> tokens = new ArrayDeque<>();
+	private final Deque<Token> tokens = new ArrayDeque<>();
+
+	private boolean inDocString = false;
 
 	public TokenQueue() {
 
@@ -71,6 +73,10 @@ public class TokenQueue {
 		do {
 			try {
 				line = lineNumberReader.readLine();
+				if (null != line) {
+					line = line.replaceAll("\\p{C}", "");
+				}
+				line = null == line ? null : line.replaceAll("\\p{C}", "");
 				Token token = tokenize(line, lineNumberReader.getLineNumber());
 				if (null != token) {
 					tokens.add(token);
@@ -82,13 +88,20 @@ public class TokenQueue {
 		} while (null != line);
 	}
 
-	//TODO added tokenization rules for DocStringSeparatorToken and TableRowToken
+	//TODO fix rules for DocStringSeparator...Gherkin allows an alternate separator ''', and any characters included in a DocString should be kept
 	//TODO handle LanguageToken?
 	private Token tokenize(String s, int i) {
 		if (null == s) {
 			return new Token(null, EOFToken, i);
 		}
 		String trimmed = s.trim();
+		if (trimmed.startsWith("\"\"\"")) {
+			inDocString = !inDocString;
+			return new Token(null, DocStringSeparatorToken, i);
+		}
+		if (inDocString){
+			return new Token(s, OtherToken, i);
+		}
 		if (trimmed.startsWith("#") || trimmed.equals("")) {
 			return null;
 		}

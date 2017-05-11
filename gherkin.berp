@@ -13,7 +13,8 @@ Scenario! [#Empty|#Comment|#TagLine->#ScenarioLine]:= #TagLine* #ScenarioLine #O
 
 ScenarioOutline! [#Empty|#Comment|#TagLine->#ScenarioOutlineLine]:= #TagLine* #ScenarioOutlineLine #Other* Step* Examples+
 
-Examples! := #TagLine* #ExamplesLine #Other* ExamplesTable
+Examples! [#Empty|#Comment|#TagLine->#ExamplesLine]:= #TagLine* #ExamplesLine #Other* ExamplesTable
+
 ExamplesTable! := TableRow TableRow+
 
 Step! := #StepLine (DataTable | DocString)?

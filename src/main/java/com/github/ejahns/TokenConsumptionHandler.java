@@ -14,10 +14,15 @@ import com.github.ejahns.model.TableRow;
 import com.github.ejahns.model.interfaces.hastoken.HasDescription;
 import com.github.ejahns.model.interfaces.haselement.HasTags;
 
-public class TokenConsumptionHandler {
+class TokenConsumptionHandler {
 
 	public static void consume(GherkinElement e, Token t) {
 		switch (t.getType()) {
+			case DocStringSeparatorToken:
+				if (e instanceof DocString) {
+					return;
+				}
+				break;
 			case TagLineToken:
 				if (e instanceof HasTags) {
 					if (null == ((HasTags) e).getTags()) {
@@ -107,5 +112,6 @@ public class TokenConsumptionHandler {
 			default:
 				throw new RuntimeException();
 		}
+		throw new RuntimeException();
 	}
 }

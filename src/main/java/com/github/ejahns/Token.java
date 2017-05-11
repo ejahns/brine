@@ -4,10 +4,10 @@ import com.github.ejahns.Parser.TokenType;
 
 public class Token {
 
-	private TokenType type;
-	private String keyword;
-	private String line;
-	private int lineNum;
+	private final TokenType type;
+	private final String keyword;
+	private final String line;
+	private final int lineNum;
 
 	public Token(String keyword, String line, TokenType type, int lineNum) {
 		this.line = line;
