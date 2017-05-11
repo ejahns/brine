@@ -14,7 +14,7 @@ import com.github.ejahns.model.interfaces.GherkinElement;
 import com.github.ejahns.model.interfaces.haselement.HasTags;
 import com.github.ejahns.model.interfaces.hastoken.HasDescription;
 
-class TokenConsumptionHandler {
+public class TokenConsumptionHandler {
 
 	public static void consume(GherkinElement e, Token t) {
 		switch (t.getType()) {
