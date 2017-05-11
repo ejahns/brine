@@ -1,4 +1,4 @@
-package com.github.ejahns;
+package com.github.ejahns.token;
 
 import java.util.ArrayList;
 
@@ -6,13 +6,13 @@ import com.github.ejahns.model.Background;
 import com.github.ejahns.model.DocString;
 import com.github.ejahns.model.Examples;
 import com.github.ejahns.model.Feature;
-import com.github.ejahns.model.interfaces.GherkinElement;
 import com.github.ejahns.model.Scenario;
 import com.github.ejahns.model.ScenarioOutline;
 import com.github.ejahns.model.Step;
 import com.github.ejahns.model.TableRow;
-import com.github.ejahns.model.interfaces.hastoken.HasDescription;
+import com.github.ejahns.model.interfaces.GherkinElement;
 import com.github.ejahns.model.interfaces.haselement.HasTags;
+import com.github.ejahns.model.interfaces.hastoken.HasDescription;
 
 class TokenConsumptionHandler {
 

@@ -14,6 +14,8 @@ import com.github.ejahns.ParserException.*;
 @foreach(var rule in Model.RuleSet.DerivedRules.Where(r => !r.TempRule))
 {<text>import com.github.ejahns.model.@(rule.Name);
 </text>}
+import com.github.ejahns.token.Token;
+import com.github.ejahns.token.TokenProvider;
 
 import static com.github.ejahns.Parser.TokenType.*;
 import static java.util.Arrays.*;
@@ -21,7 +23,7 @@ import static java.util.Arrays.*;
 public class @Model.ParserClassName {
 
 	private final GherkinElementStackHandler stackHandler = new GherkinElementStackHandler();
-	private TokenQueue queue;
+	private TokenProvider provider;
 	private boolean collectErrors = false;
     private List<String> errors;
 
@@ -35,13 +37,13 @@ public class @Model.ParserClassName {
 		}
 		}
 
-	public @Model.RuleSet.StartRule.Name parse(TokenQueue queue) {
-		this.queue = queue;
+	public @Model.RuleSet.StartRule.Name parse(TokenProvider provider) {
+		this.provider = provider;
 		stackHandler.push(@(Model.RuleSet.StartRule.Name).class);
 		int state = 0;
 		Token token;
 		do {
-			token = queue.next();
+			token = provider.next();
 			state = matchToken(state, token);
 		} while (!token.isEOF());
 
@@ -50,11 +52,11 @@ public class @Model.ParserClassName {
 		return stackHandler.resolve();
 	}
 
-	public @Model.RuleSet.StartRule.Name parse(TokenQueue queue, List<String> errors) {
+	public @Model.RuleSet.StartRule.Name parse(TokenProvider provider, List<String> errors) {
 		this.collectErrors = true;
 		this.errors = errors;
 		this.stackHandler.setCollectErrors(errors);
-		return parse(queue);
+		return parse(provider);
 	}
 
 	private int matchToken(int state, Token token) {
@@ -107,7 +109,7 @@ public class @Model.ParserClassName {
 		boolean match = false;
 		do
 		{
-			token = queue.next();
+			token = provider.next();
 			newQueue.add(token);
 
 			if (false
@@ -126,7 +128,7 @@ public class @Model.ParserClassName {
 			@:|| @matchToken(tokenType)
 		}
 		);
-		queue.addToFront(newQueue);
+		provider.addToFront(newQueue);
 		return match;
 	}</text>
 }

@@ -6,6 +6,8 @@ import java.util.List;
 
 import com.github.ejahns.model.Feature;
 import com.github.ejahns.model.interfaces.GherkinElement;
+import com.github.ejahns.token.Token;
+import com.github.ejahns.token.TokenConsumptionHandler;
 
 class GherkinElementStackHandler {
 

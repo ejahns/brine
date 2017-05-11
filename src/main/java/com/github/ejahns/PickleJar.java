@@ -10,12 +10,13 @@ import java.nio.file.Paths;
 import java.util.List;
 
 import com.github.ejahns.model.Feature;
+import com.github.ejahns.token.TokenProvider;
 
 public class PickleJar {
 
 	private static Feature cure(Reader reader) {
-		TokenQueue tokenQueue = new TokenQueue(reader);
-		return new Parser().parse(tokenQueue);
+		TokenProvider tokenProvider = new TokenProvider(reader);
+		return new Parser().parse(tokenProvider);
 	}
 
 	public static Feature cure(File file) throws FileNotFoundException {
@@ -45,7 +46,7 @@ public class PickleJar {
 	}
 
 	private static Feature cureCollectErrors(FileReader fileReader, List<String> errors) {
-		TokenQueue tokenQueue = new TokenQueue(fileReader, errors);
-		return (new Parser()).parse(tokenQueue, errors);
+		TokenProvider tokenProvider = new TokenProvider(fileReader, errors);
+		return (new Parser()).parse(tokenProvider, errors);
 	}
 }

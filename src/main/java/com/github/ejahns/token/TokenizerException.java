@@ -1,4 +1,4 @@
-package com.github.ejahns;
+package com.github.ejahns.token;
 
 class TokenizerException extends RuntimeException {
 
