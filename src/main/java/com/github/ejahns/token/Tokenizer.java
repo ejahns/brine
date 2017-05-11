@@ -67,7 +67,7 @@ public class Tokenizer {
 				throw new TokenizerException(
 					String.format(
 						"expected final '|' at end of line %s: %s",
-						line,
+						lineNum,
 						trim)
 				);
 			}
@@ -108,7 +108,8 @@ public class Tokenizer {
 				if (trim.startsWith(TITLE_SEPARATOR)) {
 					trim = trim.substring(1).trim();
 				}
-				return new Token(keyword, trim, type, lineNum);
+				trim = trim.equals("") ? null : trim;
+				return new Token(keyword.trim(), trim, type, lineNum);
 			}
 		}
 		return null;
