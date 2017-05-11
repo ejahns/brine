@@ -16,24 +16,32 @@ import com.google.gson.GsonBuilder;
 
 public class Main {
 
-	@Parameter(names = {"-l", "--log"}, description = "Logs and reports errors rather than throwing exceptions")
+	@Parameter(names = {"-h", "--help"}, description = "Display help", help = true)
+	private boolean help;
+
+	@Parameter(names = {"-l", "--log"}, description = "Log and report errors rather than throwing exceptions")
 	private boolean logErrors;
 
-	@Parameter(names = {"-p", "--pretty"}, description = "Print pretty json")
+	@Parameter(names = {"-p", "--pretty"}, description = "Pretty print json")
 	private boolean pretty;
 
-	@Parameter(names = {"-s", "--suppress"}, description = "Suppress json output, only reports feature validity")
+	@Parameter(names = {"-s", "--suppress"}, description = "Suppress json output, only report feature validity")
 	private boolean suppress;
 
-	@Parameter(description = "Feature files to be parsed")
+	@Parameter(description = "files")
 	private List<String> files;
 
 	public static void main(String[] args) throws URISyntaxException, FileNotFoundException, MalformedURLException {
 		Main main = new Main();
-		JCommander.newBuilder()
+		JCommander commander = JCommander.newBuilder()
 			.addObject(main)
-			.build()
-			.parse(args);
+			.programName("brine")
+			.build();
+		commander.parse(args);
+		if (args.length == 0 || main.help) {
+			commander.usage();
+			return;
+		}
 		main.run();
 	}
 
