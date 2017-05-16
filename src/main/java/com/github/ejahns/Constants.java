@@ -7,5 +7,5 @@ public class Constants {
 	public static final String TITLE_SEPARATOR = ":";
 	public static final String CELL_SEPARATOR = "|";
 	public static final String DOCSTRING_SEPARATOR = "\"\"\"";
-	public static final String ALTERNATE_DOCSTRING_SEPARATOR = "'''";
+	public static final String ALTERNATE_DOCSTRING_SEPARATOR = "```";
 }
