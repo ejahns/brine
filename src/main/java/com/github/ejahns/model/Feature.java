@@ -12,6 +12,7 @@ public class Feature implements HasLineNumber, HasTags, HasName, HasDescription 
 	private String absoluteLocation;
 	private String relativeLocation;
 
+	private String language;
 	private int line;
 	private List<String> tags;
 	private String name;
@@ -35,6 +36,14 @@ public class Feature implements HasLineNumber, HasTags, HasName, HasDescription 
 	//TODO don't expose this method
 	public void setRelativeLocation(String relativeLocation) {
 		this.relativeLocation = relativeLocation;
+	}
+
+	public String getLanguage() {
+		return language;
+	}
+
+	public void setLanguage(String language) {
+		this.language = language;
 	}
 
 	@Override

@@ -1,19 +1,25 @@
 package com.github.ejahns.model;
 
-import java.util.List;
-
 import com.github.ejahns.model.interfaces.GherkinElement;
 
-//TODO implement
 public class DocString implements GherkinElement {
 
-	private List<String> lines;
+	private String content;
+	private String contentType;
 
-	public List<String> getLines() {
-		return lines;
+	public String getContent() {
+		return content;
 	}
 
-	public void setLines(List<String> lines) {
-		this.lines = lines;
+	public void setContent(String content) {
+		this.content = content;
+	}
+
+	public String getContentType() {
+		return contentType;
+	}
+
+	public void setContentType(String contentType) {
+		this.contentType = contentType;
 	}
 }

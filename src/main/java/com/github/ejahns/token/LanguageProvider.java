@@ -1,4 +1,4 @@
-package com.github.ejahns;
+package com.github.ejahns.token;
 
 import java.io.FileNotFoundException;
 import java.io.FileReader;
@@ -28,6 +28,9 @@ public class LanguageProvider {
 			}
 		}
 		Map<String, List<String>> keywords = languages.get(language);
+		if (null == keywords) {
+			throw new TokenizerException(language + " does not match any language");
+		}
 		return new KeywordProvider(language, keywords);
 	}
 }

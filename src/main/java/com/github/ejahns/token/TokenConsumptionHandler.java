@@ -18,8 +18,16 @@ public class TokenConsumptionHandler {
 
 	public static void consume(GherkinElement e, Token t) {
 		switch (t.getType()) {
+			case LanguageToken:
+				if (e instanceof Feature) {
+					((Feature) e).setLanguage(t.getLine());
+				}
+				return;
 			case DocStringSeparatorToken:
 				if (e instanceof DocString) {
+					if (null == ((DocString) e).getContentType() && null == ((DocString) e).getContent()) {
+						((DocString) e).setContentType(t.getLine());
+					}
 					return;
 				}
 				break;
@@ -49,20 +57,26 @@ public class TokenConsumptionHandler {
 					return;
 				}
 				if (e instanceof DocString) {
-					if (null == ((DocString) e).getLines()) {
-						((DocString) e).setLines(new ArrayList<>());
+					if (null == ((DocString) e).getContent()) {
+						((DocString) e).setContent(t.getLine());
 					}
-					((DocString) e).getLines().add(t.getLine());
+					else {
+						((DocString) e).setContent(
+							((DocString) e).getContent()
+								.concat("\n")
+								.concat(t.getLine())
+						);
+					}
 					return;
 				}
 				break;
 			case TableRowToken:
 				if (e instanceof TableRow) {
 					((TableRow) e).setLine(t.getLineNum());
-					String[] split = t.getLine().split("\\|");
+					String[] split = t.getLine().split("(?<!\\\\)\\|");
 					ArrayList<String> cells = new ArrayList<>();
 					for (int i = 1; i < split.length; i++) {
-						cells.add(split[i].trim());
+						cells.add(split[i].trim().replaceAll("\\\\\\|", "\\|"));
 					}
 					((TableRow) e).setCells(cells);
 					return;
@@ -110,8 +124,8 @@ public class TokenConsumptionHandler {
 				//Handle unexpected EOF
 				return;
 			default:
-				throw new RuntimeException();
+
 		}
-		throw new RuntimeException();
+		throw new TokenizerException("no rule exists for assigning " + t.getType() + " to element of type " + e.getClass());
 	}
 }

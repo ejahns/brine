@@ -1,4 +1,4 @@
-package com.github.ejahns;
+package com.github.ejahns.token;
 
 import java.util.ArrayList;
 import java.util.HashSet;

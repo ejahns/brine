@@ -4,8 +4,6 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import com.github.ejahns.KeywordProvider;
-import com.github.ejahns.LanguageProvider;
 import com.github.ejahns.Parser;
 
 import static com.github.ejahns.Constants.*;
@@ -40,12 +38,16 @@ public class Tokenizer {
 		if (trim.startsWith(DOCSTRING_SEPARATOR)) {
 			currentDocStringSeparator = DOCSTRING_SEPARATOR;
 			readingDocString = true;
-			return new Token(null, DocStringSeparatorToken, lineNum);
+			String type = trim.substring(DOCSTRING_SEPARATOR.length());
+			type = type.equals("") ? null : type;
+			return new Token(type, DocStringSeparatorToken, lineNum);
 		}
 		if (trim.startsWith(ALTERNATE_DOCSTRING_SEPARATOR)) {
 			currentDocStringSeparator = ALTERNATE_DOCSTRING_SEPARATOR;
 			readingDocString = true;
-			return new Token(null, DocStringSeparatorToken, lineNum);
+			String type = trim.substring(ALTERNATE_DOCSTRING_SEPARATOR.length());
+			type = type.equals("") ? null : type;
+			return new Token(type, DocStringSeparatorToken, lineNum);
 		}
 		if (trim.equals("")) {
 			return null;
