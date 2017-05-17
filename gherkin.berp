@@ -5,13 +5,13 @@
 	Namespace -> Gherkin
 ]
 
-Feature! := #Language? #TagLine* #FeatureLine #Other* Background? (Scenario|ScenarioOutline)*
+Feature! := #Language? #TagLine* #FeatureLine #Other* Background? (Scenario|ScenarioOutline)+
 
-Background! := #BackgroundLine #Other* Step*
+Background! := #BackgroundLine #Other* Step+
 
-Scenario! [#Empty|#Comment|#TagLine->#ScenarioLine]:= #TagLine* #ScenarioLine #Other* Step*
+Scenario! [#Empty|#Comment|#TagLine->#ScenarioLine]:= #TagLine* #ScenarioLine #Other* Step+
 
-ScenarioOutline! [#Empty|#Comment|#TagLine->#ScenarioOutlineLine]:= #TagLine* #ScenarioOutlineLine #Other* Step* Examples+
+ScenarioOutline! [#Empty|#Comment|#TagLine->#ScenarioOutlineLine]:= #TagLine* #ScenarioOutlineLine #Other* Step+ Examples+
 
 Examples! [#Empty|#Comment|#TagLine->#ExamplesLine]:= #TagLine* #ExamplesLine #Other* ExamplesTable
 

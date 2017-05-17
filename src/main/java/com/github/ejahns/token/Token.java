@@ -45,6 +45,6 @@ public class Token {
 
 	@Override
 	public String toString() {
-		return type + ": " + line;
+		return String.format("%s: '%s'", type, line);
 	}
 }

@@ -1,5 +1,5 @@
 {
-	"relativeLocation": "src/test/resources/data_table.feature",
+	"relativeLocation": "src/test/resources/good/data_table.feature",
 	"line": 1,
 	"name": "Some Feature",
 	"scenarios": [

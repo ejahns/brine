@@ -1,5 +1,5 @@
 {
-	"relativeLocation": "src/test/resources/sample_feature.feature",
+	"relativeLocation": "src/test/resources/good/sample_feature.feature",
 	"line": 3,
 	"tags": [
 		"@Some Tag",
