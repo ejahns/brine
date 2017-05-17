@@ -8,7 +8,7 @@ import java.util.Map;
 import com.google.gson.Gson;
 import com.google.gson.stream.JsonReader;
 
-public class LanguageProvider {
+class LanguageProvider {
 
 	private static final String DEFAULT_LANGUAGE = "en";
 	private static Map<String, Map<String, List<String>>> languages;

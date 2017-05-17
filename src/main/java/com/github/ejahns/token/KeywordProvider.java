@@ -116,9 +116,9 @@ public class KeywordProvider {
 
 	class TokenAssociation {
 
-		String keyword;
-		TokenType tokenType;
-		String line;
+		final String keyword;
+		final TokenType tokenType;
+		final String line;
 
 		TokenAssociation(String keyword, TokenType tokenType, String line) {
 			this.keyword = keyword;
