@@ -9,29 +9,34 @@ import com.github.ejahns.model.interfaces.GherkinElement;
 import com.github.ejahns.token.Token;
 import com.github.ejahns.token.TokenConsumptionHandler;
 
-class GherkinElementStackHandler {
-
-	private List<String> errors;
-	private boolean collectErrors = false;
+class FeatureBuildingStackHandler implements StackHandler<GherkinElement, Token> {
 
 	private final Deque<GherkinElement> stack = new ArrayDeque<>();
+	private List<String> errors;
+	private boolean collectErrors = false;
 	private Feature result = null;
 
-	public void setCollectErrors(List<String> errors) {
+	FeatureBuildingStackHandler() {
+
+	}
+
+	FeatureBuildingStackHandler(List<String> errors) {
 		this.collectErrors = true;
 		this.errors = errors;
 	}
 
+	@Override
 	public void push(Class<? extends GherkinElement> clazz) {
 		try {
 			stack.push(clazz.newInstance());
 		}
 		catch (InstantiationException | IllegalAccessException e) {
-			e.printStackTrace();
+			throw new RuntimeException(e);
 		}
 	}
 
-	public void collapse(Class<? extends GherkinElement> clazz) {
+	@Override
+	public void popConsume(Class<? extends GherkinElement> clazz) {
 		GherkinElement pop = stack.pop();
 		if (stack.size() > 0) {
 			try {
@@ -52,13 +57,15 @@ class GherkinElementStackHandler {
 		}
 	}
 
+	@Override
 	public Feature resolve() {
 		while (null == result) {
-			collapse(GherkinElement.class);
+			popConsume(GherkinElement.class);
 		}
 		return result;
 	}
 
+	@Override
 	public void consume(Token t) {
 		TokenConsumptionHandler.consume(stack.peek(), t);
 	}

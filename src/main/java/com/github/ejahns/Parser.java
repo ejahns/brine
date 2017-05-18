@@ -19,6 +19,7 @@ import com.github.ejahns.model.Scenario;
 import com.github.ejahns.model.ScenarioOutline;
 import com.github.ejahns.model.Step;
 import com.github.ejahns.model.TableRow;
+import com.github.ejahns.model.interfaces.GherkinElement;
 import com.github.ejahns.token.Token;
 import com.github.ejahns.token.TokenProvider;
 
@@ -27,7 +28,7 @@ import static java.util.Arrays.*;
 
 public class Parser {
 
-	private final GherkinElementStackHandler stackHandler = new GherkinElementStackHandler();
+	private StackHandler<GherkinElement, Token> stackHandler;
 	private TokenProvider provider;
 	private boolean collectErrors = false;
     private List<String> errors;
@@ -54,8 +55,20 @@ public class Parser {
 		}
 		}
 
-	public Feature parse(TokenProvider provider) {
+	Feature parse(TokenProvider provider) {
+		return parse(provider, new FeatureBuildingStackHandler());
+	}
+
+	Feature parse(TokenProvider provider, List<String> errors) {
+		this.collectErrors = true;
+		this.errors = errors;
+		return parse(provider, new FeatureBuildingStackHandler(errors));
+	}
+
+	private Feature parse(TokenProvider provider, StackHandler<GherkinElement, Token> stackHandler) {
 		this.provider = provider;
+		this.stackHandler = stackHandler;
+
 		stackHandler.push(Feature.class);
 		int state = 0;
 		Token token;
@@ -64,16 +77,7 @@ public class Parser {
 			state = matchToken(state, token);
 		} while (!token.isEOF());
 
-		stackHandler.collapse(Feature.class);
-
-		return stackHandler.resolve();
-	}
-
-	public Feature parse(TokenProvider provider, List<String> errors) {
-		this.collectErrors = true;
-		this.errors = errors;
-		this.stackHandler.setCollectErrors(errors);
-		return parse(provider);
+		return (Feature) stackHandler.resolve();
 	}
 
 	private int matchToken(int state, Token token) {
@@ -299,7 +303,7 @@ public class Parser {
 			return 23;
 		}
 		if (token.getType().equals(StepLineToken)) {
-			stackHandler.collapse(Step.class);
+			stackHandler.popConsume(Step.class);
 			stackHandler.push(Step.class);
 			stackHandler.consume(token);
 			return 4;
@@ -307,8 +311,8 @@ public class Parser {
 		if (token.getType().equals(TagLineToken)) {
 			if (lookahead_0())
 			{
-			stackHandler.collapse(Step.class);
-			stackHandler.collapse(Background.class);
+			stackHandler.popConsume(Step.class);
+			stackHandler.popConsume(Background.class);
 			stackHandler.push(Scenario.class);
 			stackHandler.consume(token);
 			return 6;
@@ -317,23 +321,23 @@ public class Parser {
 		if (token.getType().equals(TagLineToken)) {
 			if (lookahead_1())
 			{
-			stackHandler.collapse(Step.class);
-			stackHandler.collapse(Background.class);
+			stackHandler.popConsume(Step.class);
+			stackHandler.popConsume(Background.class);
 			stackHandler.push(ScenarioOutline.class);
 			stackHandler.consume(token);
 			return 10;
 			}
 		}
 		if (token.getType().equals(ScenarioLineToken)) {
-			stackHandler.collapse(Step.class);
-			stackHandler.collapse(Background.class);
+			stackHandler.popConsume(Step.class);
+			stackHandler.popConsume(Background.class);
 			stackHandler.push(Scenario.class);
 			stackHandler.consume(token);
 			return 7;
 		}
 		if (token.getType().equals(ScenarioOutlineLineToken)) {
-			stackHandler.collapse(Step.class);
-			stackHandler.collapse(Background.class);
+			stackHandler.popConsume(Step.class);
+			stackHandler.popConsume(Background.class);
 			stackHandler.push(ScenarioOutline.class);
 			stackHandler.consume(token);
 			return 11;
@@ -359,15 +363,15 @@ public class Parser {
 	// Feature:4>Background:2>Step:1>__alt1:0>DataTable:0>TableRow:0>#TableRow:0
 	private int matchTokenAt_5(Token token) {
 		if (token.getType().equals(TableRowToken)) {
-			stackHandler.collapse(TableRow.class);
+			stackHandler.popConsume(TableRow.class);
 			stackHandler.push(TableRow.class);
 			stackHandler.consume(token);
 			return 5;
 		}
 		if (token.getType().equals(StepLineToken)) {
-			stackHandler.collapse(TableRow.class);
-			stackHandler.collapse(DataTable.class);
-			stackHandler.collapse(Step.class);
+			stackHandler.popConsume(TableRow.class);
+			stackHandler.popConsume(DataTable.class);
+			stackHandler.popConsume(Step.class);
 			stackHandler.push(Step.class);
 			stackHandler.consume(token);
 			return 4;
@@ -375,10 +379,10 @@ public class Parser {
 		if (token.getType().equals(TagLineToken)) {
 			if (lookahead_0())
 			{
-			stackHandler.collapse(TableRow.class);
-			stackHandler.collapse(DataTable.class);
-			stackHandler.collapse(Step.class);
-			stackHandler.collapse(Background.class);
+			stackHandler.popConsume(TableRow.class);
+			stackHandler.popConsume(DataTable.class);
+			stackHandler.popConsume(Step.class);
+			stackHandler.popConsume(Background.class);
 			stackHandler.push(Scenario.class);
 			stackHandler.consume(token);
 			return 6;
@@ -387,29 +391,29 @@ public class Parser {
 		if (token.getType().equals(TagLineToken)) {
 			if (lookahead_1())
 			{
-			stackHandler.collapse(TableRow.class);
-			stackHandler.collapse(DataTable.class);
-			stackHandler.collapse(Step.class);
-			stackHandler.collapse(Background.class);
+			stackHandler.popConsume(TableRow.class);
+			stackHandler.popConsume(DataTable.class);
+			stackHandler.popConsume(Step.class);
+			stackHandler.popConsume(Background.class);
 			stackHandler.push(ScenarioOutline.class);
 			stackHandler.consume(token);
 			return 10;
 			}
 		}
 		if (token.getType().equals(ScenarioLineToken)) {
-			stackHandler.collapse(TableRow.class);
-			stackHandler.collapse(DataTable.class);
-			stackHandler.collapse(Step.class);
-			stackHandler.collapse(Background.class);
+			stackHandler.popConsume(TableRow.class);
+			stackHandler.popConsume(DataTable.class);
+			stackHandler.popConsume(Step.class);
+			stackHandler.popConsume(Background.class);
 			stackHandler.push(Scenario.class);
 			stackHandler.consume(token);
 			return 7;
 		}
 		if (token.getType().equals(ScenarioOutlineLineToken)) {
-			stackHandler.collapse(TableRow.class);
-			stackHandler.collapse(DataTable.class);
-			stackHandler.collapse(Step.class);
-			stackHandler.collapse(Background.class);
+			stackHandler.popConsume(TableRow.class);
+			stackHandler.popConsume(DataTable.class);
+			stackHandler.popConsume(Step.class);
+			stackHandler.popConsume(Background.class);
 			stackHandler.push(ScenarioOutline.class);
 			stackHandler.consume(token);
 			return 11;
@@ -484,8 +488,8 @@ public class Parser {
 	// Feature:5>__alt0:0>Scenario:3>Step:0>#StepLine:0
 	private int matchTokenAt_8(Token token) {
 		if (token.getType().equals(EOFToken)) {
-			stackHandler.collapse(Step.class);
-			stackHandler.collapse(Scenario.class);
+			stackHandler.popConsume(Step.class);
+			stackHandler.popConsume(Scenario.class);
 			stackHandler.consume(token);
 			return 18;
 		}
@@ -501,7 +505,7 @@ public class Parser {
 			return 21;
 		}
 		if (token.getType().equals(StepLineToken)) {
-			stackHandler.collapse(Step.class);
+			stackHandler.popConsume(Step.class);
 			stackHandler.push(Step.class);
 			stackHandler.consume(token);
 			return 8;
@@ -509,8 +513,8 @@ public class Parser {
 		if (token.getType().equals(TagLineToken)) {
 			if (lookahead_0())
 			{
-			stackHandler.collapse(Step.class);
-			stackHandler.collapse(Scenario.class);
+			stackHandler.popConsume(Step.class);
+			stackHandler.popConsume(Scenario.class);
 			stackHandler.push(Scenario.class);
 			stackHandler.consume(token);
 			return 6;
@@ -519,23 +523,23 @@ public class Parser {
 		if (token.getType().equals(TagLineToken)) {
 			if (lookahead_1())
 			{
-			stackHandler.collapse(Step.class);
-			stackHandler.collapse(Scenario.class);
+			stackHandler.popConsume(Step.class);
+			stackHandler.popConsume(Scenario.class);
 			stackHandler.push(ScenarioOutline.class);
 			stackHandler.consume(token);
 			return 10;
 			}
 		}
 		if (token.getType().equals(ScenarioLineToken)) {
-			stackHandler.collapse(Step.class);
-			stackHandler.collapse(Scenario.class);
+			stackHandler.popConsume(Step.class);
+			stackHandler.popConsume(Scenario.class);
 			stackHandler.push(Scenario.class);
 			stackHandler.consume(token);
 			return 7;
 		}
 		if (token.getType().equals(ScenarioOutlineLineToken)) {
-			stackHandler.collapse(Step.class);
-			stackHandler.collapse(Scenario.class);
+			stackHandler.popConsume(Step.class);
+			stackHandler.popConsume(Scenario.class);
 			stackHandler.push(ScenarioOutline.class);
 			stackHandler.consume(token);
 			return 11;
@@ -561,23 +565,23 @@ public class Parser {
 	// Feature:5>__alt0:0>Scenario:3>Step:1>__alt1:0>DataTable:0>TableRow:0>#TableRow:0
 	private int matchTokenAt_9(Token token) {
 		if (token.getType().equals(EOFToken)) {
-			stackHandler.collapse(TableRow.class);
-			stackHandler.collapse(DataTable.class);
-			stackHandler.collapse(Step.class);
-			stackHandler.collapse(Scenario.class);
+			stackHandler.popConsume(TableRow.class);
+			stackHandler.popConsume(DataTable.class);
+			stackHandler.popConsume(Step.class);
+			stackHandler.popConsume(Scenario.class);
 			stackHandler.consume(token);
 			return 18;
 		}
 		if (token.getType().equals(TableRowToken)) {
-			stackHandler.collapse(TableRow.class);
+			stackHandler.popConsume(TableRow.class);
 			stackHandler.push(TableRow.class);
 			stackHandler.consume(token);
 			return 9;
 		}
 		if (token.getType().equals(StepLineToken)) {
-			stackHandler.collapse(TableRow.class);
-			stackHandler.collapse(DataTable.class);
-			stackHandler.collapse(Step.class);
+			stackHandler.popConsume(TableRow.class);
+			stackHandler.popConsume(DataTable.class);
+			stackHandler.popConsume(Step.class);
 			stackHandler.push(Step.class);
 			stackHandler.consume(token);
 			return 8;
@@ -585,10 +589,10 @@ public class Parser {
 		if (token.getType().equals(TagLineToken)) {
 			if (lookahead_0())
 			{
-			stackHandler.collapse(TableRow.class);
-			stackHandler.collapse(DataTable.class);
-			stackHandler.collapse(Step.class);
-			stackHandler.collapse(Scenario.class);
+			stackHandler.popConsume(TableRow.class);
+			stackHandler.popConsume(DataTable.class);
+			stackHandler.popConsume(Step.class);
+			stackHandler.popConsume(Scenario.class);
 			stackHandler.push(Scenario.class);
 			stackHandler.consume(token);
 			return 6;
@@ -597,29 +601,29 @@ public class Parser {
 		if (token.getType().equals(TagLineToken)) {
 			if (lookahead_1())
 			{
-			stackHandler.collapse(TableRow.class);
-			stackHandler.collapse(DataTable.class);
-			stackHandler.collapse(Step.class);
-			stackHandler.collapse(Scenario.class);
+			stackHandler.popConsume(TableRow.class);
+			stackHandler.popConsume(DataTable.class);
+			stackHandler.popConsume(Step.class);
+			stackHandler.popConsume(Scenario.class);
 			stackHandler.push(ScenarioOutline.class);
 			stackHandler.consume(token);
 			return 10;
 			}
 		}
 		if (token.getType().equals(ScenarioLineToken)) {
-			stackHandler.collapse(TableRow.class);
-			stackHandler.collapse(DataTable.class);
-			stackHandler.collapse(Step.class);
-			stackHandler.collapse(Scenario.class);
+			stackHandler.popConsume(TableRow.class);
+			stackHandler.popConsume(DataTable.class);
+			stackHandler.popConsume(Step.class);
+			stackHandler.popConsume(Scenario.class);
 			stackHandler.push(Scenario.class);
 			stackHandler.consume(token);
 			return 7;
 		}
 		if (token.getType().equals(ScenarioOutlineLineToken)) {
-			stackHandler.collapse(TableRow.class);
-			stackHandler.collapse(DataTable.class);
-			stackHandler.collapse(Step.class);
-			stackHandler.collapse(Scenario.class);
+			stackHandler.popConsume(TableRow.class);
+			stackHandler.popConsume(DataTable.class);
+			stackHandler.popConsume(Step.class);
+			stackHandler.popConsume(Scenario.class);
 			stackHandler.push(ScenarioOutline.class);
 			stackHandler.consume(token);
 			return 11;
@@ -705,19 +709,19 @@ public class Parser {
 			return 19;
 		}
 		if (token.getType().equals(StepLineToken)) {
-			stackHandler.collapse(Step.class);
+			stackHandler.popConsume(Step.class);
 			stackHandler.push(Step.class);
 			stackHandler.consume(token);
 			return 12;
 		}
 		if (token.getType().equals(TagLineToken)) {
-			stackHandler.collapse(Step.class);
+			stackHandler.popConsume(Step.class);
 			stackHandler.push(Examples.class);
 			stackHandler.consume(token);
 			return 14;
 		}
 		if (token.getType().equals(ExamplesLineToken)) {
-			stackHandler.collapse(Step.class);
+			stackHandler.popConsume(Step.class);
 			stackHandler.push(Examples.class);
 			stackHandler.consume(token);
 			return 15;
@@ -743,31 +747,31 @@ public class Parser {
 	// Feature:6>__alt0:1>ScenarioOutline:3>Step:1>__alt1:0>DataTable:0>TableRow:0>#TableRow:0
 	private int matchTokenAt_13(Token token) {
 		if (token.getType().equals(TableRowToken)) {
-			stackHandler.collapse(TableRow.class);
+			stackHandler.popConsume(TableRow.class);
 			stackHandler.push(TableRow.class);
 			stackHandler.consume(token);
 			return 13;
 		}
 		if (token.getType().equals(StepLineToken)) {
-			stackHandler.collapse(TableRow.class);
-			stackHandler.collapse(DataTable.class);
-			stackHandler.collapse(Step.class);
+			stackHandler.popConsume(TableRow.class);
+			stackHandler.popConsume(DataTable.class);
+			stackHandler.popConsume(Step.class);
 			stackHandler.push(Step.class);
 			stackHandler.consume(token);
 			return 12;
 		}
 		if (token.getType().equals(TagLineToken)) {
-			stackHandler.collapse(TableRow.class);
-			stackHandler.collapse(DataTable.class);
-			stackHandler.collapse(Step.class);
+			stackHandler.popConsume(TableRow.class);
+			stackHandler.popConsume(DataTable.class);
+			stackHandler.popConsume(Step.class);
 			stackHandler.push(Examples.class);
 			stackHandler.consume(token);
 			return 14;
 		}
 		if (token.getType().equals(ExamplesLineToken)) {
-			stackHandler.collapse(TableRow.class);
-			stackHandler.collapse(DataTable.class);
-			stackHandler.collapse(Step.class);
+			stackHandler.popConsume(TableRow.class);
+			stackHandler.popConsume(DataTable.class);
+			stackHandler.popConsume(Step.class);
 			stackHandler.push(Examples.class);
 			stackHandler.consume(token);
 			return 15;
@@ -843,7 +847,7 @@ public class Parser {
 	// Feature:6>__alt0:1>ScenarioOutline:5>Examples:3>ExamplesTable:0>TableRow:0>#TableRow:0
 	private int matchTokenAt_16(Token token) {
 		if (token.getType().equals(TableRowToken)) {
-			stackHandler.collapse(TableRow.class);
+			stackHandler.popConsume(TableRow.class);
 			stackHandler.push(TableRow.class);
 			stackHandler.consume(token);
 			return 17;
@@ -869,15 +873,15 @@ public class Parser {
 	// Feature:6>__alt0:1>ScenarioOutline:5>Examples:3>ExamplesTable:1>TableRow:0>#TableRow:0
 	private int matchTokenAt_17(Token token) {
 		if (token.getType().equals(EOFToken)) {
-			stackHandler.collapse(TableRow.class);
-			stackHandler.collapse(ExamplesTable.class);
-			stackHandler.collapse(Examples.class);
-			stackHandler.collapse(ScenarioOutline.class);
+			stackHandler.popConsume(TableRow.class);
+			stackHandler.popConsume(ExamplesTable.class);
+			stackHandler.popConsume(Examples.class);
+			stackHandler.popConsume(ScenarioOutline.class);
 			stackHandler.consume(token);
 			return 18;
 		}
 		if (token.getType().equals(TableRowToken)) {
-			stackHandler.collapse(TableRow.class);
+			stackHandler.popConsume(TableRow.class);
 			stackHandler.push(TableRow.class);
 			stackHandler.consume(token);
 			return 17;
@@ -885,9 +889,9 @@ public class Parser {
 		if (token.getType().equals(TagLineToken)) {
 			if (lookahead_2())
 			{
-			stackHandler.collapse(TableRow.class);
-			stackHandler.collapse(ExamplesTable.class);
-			stackHandler.collapse(Examples.class);
+			stackHandler.popConsume(TableRow.class);
+			stackHandler.popConsume(ExamplesTable.class);
+			stackHandler.popConsume(Examples.class);
 			stackHandler.push(Examples.class);
 			stackHandler.consume(token);
 			return 14;
@@ -896,10 +900,10 @@ public class Parser {
 		if (token.getType().equals(TagLineToken)) {
 			if (lookahead_0())
 			{
-			stackHandler.collapse(TableRow.class);
-			stackHandler.collapse(ExamplesTable.class);
-			stackHandler.collapse(Examples.class);
-			stackHandler.collapse(ScenarioOutline.class);
+			stackHandler.popConsume(TableRow.class);
+			stackHandler.popConsume(ExamplesTable.class);
+			stackHandler.popConsume(Examples.class);
+			stackHandler.popConsume(ScenarioOutline.class);
 			stackHandler.push(Scenario.class);
 			stackHandler.consume(token);
 			return 6;
@@ -908,37 +912,37 @@ public class Parser {
 		if (token.getType().equals(TagLineToken)) {
 			if (lookahead_1())
 			{
-			stackHandler.collapse(TableRow.class);
-			stackHandler.collapse(ExamplesTable.class);
-			stackHandler.collapse(Examples.class);
-			stackHandler.collapse(ScenarioOutline.class);
+			stackHandler.popConsume(TableRow.class);
+			stackHandler.popConsume(ExamplesTable.class);
+			stackHandler.popConsume(Examples.class);
+			stackHandler.popConsume(ScenarioOutline.class);
 			stackHandler.push(ScenarioOutline.class);
 			stackHandler.consume(token);
 			return 10;
 			}
 		}
 		if (token.getType().equals(ExamplesLineToken)) {
-			stackHandler.collapse(TableRow.class);
-			stackHandler.collapse(ExamplesTable.class);
-			stackHandler.collapse(Examples.class);
+			stackHandler.popConsume(TableRow.class);
+			stackHandler.popConsume(ExamplesTable.class);
+			stackHandler.popConsume(Examples.class);
 			stackHandler.push(Examples.class);
 			stackHandler.consume(token);
 			return 15;
 		}
 		if (token.getType().equals(ScenarioLineToken)) {
-			stackHandler.collapse(TableRow.class);
-			stackHandler.collapse(ExamplesTable.class);
-			stackHandler.collapse(Examples.class);
-			stackHandler.collapse(ScenarioOutline.class);
+			stackHandler.popConsume(TableRow.class);
+			stackHandler.popConsume(ExamplesTable.class);
+			stackHandler.popConsume(Examples.class);
+			stackHandler.popConsume(ScenarioOutline.class);
 			stackHandler.push(Scenario.class);
 			stackHandler.consume(token);
 			return 7;
 		}
 		if (token.getType().equals(ScenarioOutlineLineToken)) {
-			stackHandler.collapse(TableRow.class);
-			stackHandler.collapse(ExamplesTable.class);
-			stackHandler.collapse(Examples.class);
-			stackHandler.collapse(ScenarioOutline.class);
+			stackHandler.popConsume(TableRow.class);
+			stackHandler.popConsume(ExamplesTable.class);
+			stackHandler.popConsume(Examples.class);
+			stackHandler.popConsume(ScenarioOutline.class);
 			stackHandler.push(ScenarioOutline.class);
 			stackHandler.consume(token);
 			return 11;
@@ -984,22 +988,22 @@ public class Parser {
 	// Feature:6>__alt0:1>ScenarioOutline:3>Step:1>__alt1:1>DocString:2>#DocStringSeparator:0
 	private int matchTokenAt_20(Token token) {
 		if (token.getType().equals(StepLineToken)) {
-			stackHandler.collapse(DocString.class);
-			stackHandler.collapse(Step.class);
+			stackHandler.popConsume(DocString.class);
+			stackHandler.popConsume(Step.class);
 			stackHandler.push(Step.class);
 			stackHandler.consume(token);
 			return 12;
 		}
 		if (token.getType().equals(TagLineToken)) {
-			stackHandler.collapse(DocString.class);
-			stackHandler.collapse(Step.class);
+			stackHandler.popConsume(DocString.class);
+			stackHandler.popConsume(Step.class);
 			stackHandler.push(Examples.class);
 			stackHandler.consume(token);
 			return 14;
 		}
 		if (token.getType().equals(ExamplesLineToken)) {
-			stackHandler.collapse(DocString.class);
-			stackHandler.collapse(Step.class);
+			stackHandler.popConsume(DocString.class);
+			stackHandler.popConsume(Step.class);
 			stackHandler.push(Examples.class);
 			stackHandler.consume(token);
 			return 15;
@@ -1045,15 +1049,15 @@ public class Parser {
 	// Feature:5>__alt0:0>Scenario:3>Step:1>__alt1:1>DocString:2>#DocStringSeparator:0
 	private int matchTokenAt_22(Token token) {
 		if (token.getType().equals(EOFToken)) {
-			stackHandler.collapse(DocString.class);
-			stackHandler.collapse(Step.class);
-			stackHandler.collapse(Scenario.class);
+			stackHandler.popConsume(DocString.class);
+			stackHandler.popConsume(Step.class);
+			stackHandler.popConsume(Scenario.class);
 			stackHandler.consume(token);
 			return 18;
 		}
 		if (token.getType().equals(StepLineToken)) {
-			stackHandler.collapse(DocString.class);
-			stackHandler.collapse(Step.class);
+			stackHandler.popConsume(DocString.class);
+			stackHandler.popConsume(Step.class);
 			stackHandler.push(Step.class);
 			stackHandler.consume(token);
 			return 8;
@@ -1061,9 +1065,9 @@ public class Parser {
 		if (token.getType().equals(TagLineToken)) {
 			if (lookahead_0())
 			{
-			stackHandler.collapse(DocString.class);
-			stackHandler.collapse(Step.class);
-			stackHandler.collapse(Scenario.class);
+			stackHandler.popConsume(DocString.class);
+			stackHandler.popConsume(Step.class);
+			stackHandler.popConsume(Scenario.class);
 			stackHandler.push(Scenario.class);
 			stackHandler.consume(token);
 			return 6;
@@ -1072,26 +1076,26 @@ public class Parser {
 		if (token.getType().equals(TagLineToken)) {
 			if (lookahead_1())
 			{
-			stackHandler.collapse(DocString.class);
-			stackHandler.collapse(Step.class);
-			stackHandler.collapse(Scenario.class);
+			stackHandler.popConsume(DocString.class);
+			stackHandler.popConsume(Step.class);
+			stackHandler.popConsume(Scenario.class);
 			stackHandler.push(ScenarioOutline.class);
 			stackHandler.consume(token);
 			return 10;
 			}
 		}
 		if (token.getType().equals(ScenarioLineToken)) {
-			stackHandler.collapse(DocString.class);
-			stackHandler.collapse(Step.class);
-			stackHandler.collapse(Scenario.class);
+			stackHandler.popConsume(DocString.class);
+			stackHandler.popConsume(Step.class);
+			stackHandler.popConsume(Scenario.class);
 			stackHandler.push(Scenario.class);
 			stackHandler.consume(token);
 			return 7;
 		}
 		if (token.getType().equals(ScenarioOutlineLineToken)) {
-			stackHandler.collapse(DocString.class);
-			stackHandler.collapse(Step.class);
-			stackHandler.collapse(Scenario.class);
+			stackHandler.popConsume(DocString.class);
+			stackHandler.popConsume(Step.class);
+			stackHandler.popConsume(Scenario.class);
 			stackHandler.push(ScenarioOutline.class);
 			stackHandler.consume(token);
 			return 11;
@@ -1137,8 +1141,8 @@ public class Parser {
 	// Feature:4>Background:2>Step:1>__alt1:1>DocString:2>#DocStringSeparator:0
 	private int matchTokenAt_24(Token token) {
 		if (token.getType().equals(StepLineToken)) {
-			stackHandler.collapse(DocString.class);
-			stackHandler.collapse(Step.class);
+			stackHandler.popConsume(DocString.class);
+			stackHandler.popConsume(Step.class);
 			stackHandler.push(Step.class);
 			stackHandler.consume(token);
 			return 4;
@@ -1146,9 +1150,9 @@ public class Parser {
 		if (token.getType().equals(TagLineToken)) {
 			if (lookahead_0())
 			{
-			stackHandler.collapse(DocString.class);
-			stackHandler.collapse(Step.class);
-			stackHandler.collapse(Background.class);
+			stackHandler.popConsume(DocString.class);
+			stackHandler.popConsume(Step.class);
+			stackHandler.popConsume(Background.class);
 			stackHandler.push(Scenario.class);
 			stackHandler.consume(token);
 			return 6;
@@ -1157,26 +1161,26 @@ public class Parser {
 		if (token.getType().equals(TagLineToken)) {
 			if (lookahead_1())
 			{
-			stackHandler.collapse(DocString.class);
-			stackHandler.collapse(Step.class);
-			stackHandler.collapse(Background.class);
+			stackHandler.popConsume(DocString.class);
+			stackHandler.popConsume(Step.class);
+			stackHandler.popConsume(Background.class);
 			stackHandler.push(ScenarioOutline.class);
 			stackHandler.consume(token);
 			return 10;
 			}
 		}
 		if (token.getType().equals(ScenarioLineToken)) {
-			stackHandler.collapse(DocString.class);
-			stackHandler.collapse(Step.class);
-			stackHandler.collapse(Background.class);
+			stackHandler.popConsume(DocString.class);
+			stackHandler.popConsume(Step.class);
+			stackHandler.popConsume(Background.class);
 			stackHandler.push(Scenario.class);
 			stackHandler.consume(token);
 			return 7;
 		}
 		if (token.getType().equals(ScenarioOutlineLineToken)) {
-			stackHandler.collapse(DocString.class);
-			stackHandler.collapse(Step.class);
-			stackHandler.collapse(Background.class);
+			stackHandler.popConsume(DocString.class);
+			stackHandler.popConsume(Step.class);
+			stackHandler.popConsume(Background.class);
 			stackHandler.push(ScenarioOutline.class);
 			stackHandler.consume(token);
 			return 11;

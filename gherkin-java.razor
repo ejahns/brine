@@ -16,13 +16,14 @@ import com.github.ejahns.ParserException.*;
 </text>}
 import com.github.ejahns.token.Token;
 import com.github.ejahns.token.TokenProvider;
+import com.github.ejahns.interfaces.GherkinElement;
 
 import static com.github.ejahns.Parser.TokenType.*;
 import static java.util.Arrays.*;
 
 public class @Model.ParserClassName {
 
-	private final GherkinElementStackHandler stackHandler = new GherkinElementStackHandler();
+	private StackHandler<GherkinElement, Token> stackHandler;
 	private TokenProvider provider;
 	private boolean collectErrors = false;
     private List<String> errors;
@@ -37,9 +38,21 @@ public class @Model.ParserClassName {
 		}
 		}
 
-	public @Model.RuleSet.StartRule.Name parse(TokenProvider provider) {
+	@Model.RuleSet.StartRule.Name parse(TokenProvider provider) {
+		return parse(provider, new FeatureBuildingStackHandler());
+	}
+
+	@Model.RuleSet.StartRule.Name parse(TokenProvider provider, List<String> errors) {
+		this.collectErrors = true;
+		this.errors = errors;
+		return parse(provider, new FeatureBuildingStackHandler(errors));
+	}
+
+	private @Model.RuleSet.StartRule.Name parse(TokenProvider provider, StackHandler<GherkinElement, Token> stackHandler) {
 		this.provider = provider;
-		stackHandler.push(@(Model.RuleSet.StartRule.Name).class);
+		this.stackHandler = stackHandler;
+
+		stackHandler.push(Feature.class);
 		int state = 0;
 		Token token;
 		do {
@@ -47,16 +60,7 @@ public class @Model.ParserClassName {
 			state = matchToken(state, token);
 		} while (!token.isEOF());
 
-		stackHandler.collapse(@(Model.RuleSet.StartRule.Name).class);
-
-		return stackHandler.resolve();
-	}
-
-	public @Model.RuleSet.StartRule.Name parse(TokenProvider provider, List<String> errors) {
-		this.collectErrors = true;
-		this.errors = errors;
-		this.stackHandler.setCollectErrors(errors);
-		return parse(provider);
+		return (@Model.RuleSet.StartRule.Name) stackHandler.resolve();
 	}
 
 	private int matchToken(int state, Token token) {
@@ -140,7 +144,7 @@ public class @Model.ParserClassName {
 			@:stackHandler.push(@(production.RuleName).class);
 			break;
 		case ProductionRuleType.End:
-			@:stackHandler.collapse(@(production.RuleName).class);
+			@:stackHandler.popConsume(@(production.RuleName).class);
 			break;
 		case ProductionRuleType.Process:
 			@:stackHandler.consume(token);

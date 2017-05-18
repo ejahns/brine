@@ -17,7 +17,7 @@ import com.github.ejahns.model.interfaces.haselement.HasSteps;
 
 class GherkinElementConsumptionHandler {
 
-	public static void consume(GherkinElement e1, GherkinElement e2) {
+	static void consume(GherkinElement e1, GherkinElement e2) {
 		if (e1 instanceof HasSteps && e2 instanceof Step) {
 			if (null == ((HasSteps) e1).getSteps()) {
 				((HasSteps) e1).setSteps(new ArrayList<>());
@@ -25,16 +25,18 @@ class GherkinElementConsumptionHandler {
 			((HasSteps) e1).getSteps().add((Step) e2);
 			return;
 		}
-		if (e1 instanceof Feature && e2 instanceof Background) {
-			((Feature) e1).setBackground((Background) e2);
-			return;
-		}
-		if (e1 instanceof Feature && e2 instanceof AbstractScenario) {
-			if (null == ((Feature) e1).getScenarios()) {
-				((Feature) e1).setScenarios(new ArrayList<>());
+		if (e1 instanceof Feature) {
+			if (e2 instanceof Background) {
+				((Feature) e1).setBackground((Background) e2);
+				return;
 			}
-			((Feature) e1).getScenarios().add((AbstractScenario) e2);
-			return;
+			if (e2 instanceof AbstractScenario) {
+				if (null == ((Feature) e1).getScenarios()) {
+					((Feature) e1).setScenarios(new ArrayList<>());
+				}
+				((Feature) e1).getScenarios().add((AbstractScenario) e2);
+				return;
+			}
 		}
 		if (e1 instanceof DataTable && e2 instanceof TableRow) {
 			if (null == ((DataTable) e1).getTableRows()) {
@@ -49,13 +51,14 @@ class GherkinElementConsumptionHandler {
 			((DataTable) e1).getTableRows().add((TableRow) e2);
 			return;
 		}
-		if (e1 instanceof Step && e2 instanceof DataTable) {
-			((Step) e1).setDataTable((DataTable) e2);
-			return;
-		}
-		if (e1 instanceof Step && e2 instanceof DocString) {
-			((Step) e1).setDocString((DocString) e2);
-			return;
+		if (e1 instanceof Step) {
+			if (e2 instanceof DataTable) {
+				((Step) e1).setDataTable((DataTable) e2);
+				return;
+			}
+			if (e2 instanceof DocString) {
+				((Step) e1).setDocString((DocString) e2);
+			}
 		}
 		if (e1 instanceof ExamplesTable && e2 instanceof TableRow) {
 			if (null == ((ExamplesTable) e1).getHeader()) {
@@ -83,6 +86,6 @@ class GherkinElementConsumptionHandler {
 			((ScenarioOutline) e1).getExamples().add((Examples) e2);
 			return;
 		}
-		throw new RuntimeException();
+		throw new ParserException(String.format("no rule exists for assigning %s to %s", e2.getClass(), e1.getClass()));
 	}
 }

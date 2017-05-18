@@ -126,6 +126,6 @@ public class TokenConsumptionHandler {
 			default:
 
 		}
-		throw new TokenizerException("no rule exists for assigning " + t.getType() + " to " + e.getClass());
+		throw new TokenizerException(String.format("no rule exists for assigning %s to %s", t.getType(), e.getClass()));
 	}
 }
